@@ -205,7 +205,7 @@ double delta2R(double eta1, double phi1, double eta2, double phi2) {
 }
 
 double diff_func(double f1, double f2){
-  double ff = pow(f1-f2,2)*1./pow(f1+f2,2);
+  double ff = pow(f1-f2,2)*1./pow(max(f1+f2,0.000001),2);
   return ff;
 }
 
@@ -411,6 +411,7 @@ private:
   int year;
   bool isUltraLegacy;
   bool isSoftDrop;
+  bool read_btagSF;
   
   std::string theRootFileName;
   std::string theHLTTag;
@@ -636,13 +637,15 @@ private:
     static const int nHLTmx = 17;
     const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele32_WPTight_Gsf_v","HLT_Ele20_WPLoose_Gsf_v","HLT_Ele300_CaloIdVT_GsfTrkIdT","HLT_AK8PFJet420_TrimMass30_v","HLT_AK8PFHT900_TrimMass50_v","HLT_PFJet500_v","HLT_AK8PFJet500_v","HLT_PFHT1050_v","HLT_AK8PFHT750_TrimMass50_v","HLT_AK8PFHT800_TrimMass50_v","HLT_AK8PFHT850_TrimMass50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v","HLT_DoubleEle33_CaloIdL_MW_v","HLT_DoubleEle25_CaloIdL_MW_v"};
   */  
-  static const int nHLTmx = 12;
-  const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v", "HLT_AK8PFJet500_v", "HLT_Photon200_v", "HLT_Mu37_Ele27_CaloIdL_MW_v", "HLT_Mu27_Ele37_CaloIdL_MW_v", "HLT_Mu37_TkMu27_v", "HLT_OldMu100", "HLT_TkMu100_v", "HLT_DoubleEle25_CaloIdL_MW_v"};
+  static const int nHLTmx = 16;
+  const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v", "HLT_AK8PFJet500_v", "HLT_Photon200_v", "HLT_Mu37_Ele27_CaloIdL_MW_v", "HLT_Mu27_Ele37_CaloIdL_MW_v", "HLT_Mu37_TkMu27_v", "HLT_OldMu100", "HLT_TkMu100_v", "HLT_DoubleEle25_CaloIdL_MW_v","HLT_PFMET250_HBHECleaned","HLT_PFMET300_HBHECleaned","HLT_PFMET200_HBHE_BeamHaloCleaned","HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned 
+
+"};
   
   //HLT_AK8PFJet360_TrimMass30_v = > can be added 
   //HLT_Ele20_WPLoose_Gsf_v : this was there till 19th Jan, 2020 as 6th element 
   
-  bool hlt_IsoMu24, hlt_Mu50, hlt_Ele50_PFJet165, hlt_Ele115, hlt_AK8PFJet500, hlt_Photon200, hlt_Mu37Ele27, hlt_Mu27Ele37, hlt_Mu37TkMu27, hlt_OldMu100, hlt_TkMu100, hlt_DoubleEle25;  
+  bool hlt_IsoMu24, hlt_Mu50, hlt_Ele50_PFJet165, hlt_Ele115, hlt_AK8PFJet500, hlt_Photon200, hlt_Mu37Ele27, hlt_Mu27Ele37, hlt_Mu37TkMu27, hlt_OldMu100, hlt_TkMu100, hlt_DoubleEle25, hlt_PFMET250, hlt_PFMET300, hlt_PFMET200, hlt_PFMET200_TypeOne;  
   
   int trig_value;
   
@@ -658,7 +661,10 @@ private:
   JetCorrectorParameters *L1FastAK8, *L2RelativeAK8, *L3AbsoluteAK8, *L2L3ResidualAK8;
   vector<JetCorrectorParameters> vecL1FastAK8, vecL2RelativeAK8, vecL3AbsoluteAK8, vecL2L3ResidualAK8;
   FactorizedJetCorrector *jecL1FastAK8, *jecL2RelativeAK8, *jecL3AbsoluteAK8, *jecL2L3ResidualAK8;
-  
+
+  BTagCalibration calib_deepcsv, calib_deepflav;
+  BTagCalibrationReader reader_deepcsv, reader_deepflav;
+
   std::string melectronID_isowp90, melectronID_noisowp90;
   std::string melectronID_isowp80, melectronID_noisowp80;
 
@@ -672,6 +678,9 @@ private:
   
   std::string mJECUncFileAK8;
   std::vector<JetCorrectionUncertainty*> vsrcAK8 ;
+
+  std::string mBtagSF_DeepCSV;
+  std::string mBtagSF_DeepFlav;
 };
 
 //
@@ -700,7 +709,8 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   isSoftDrop      = pset.getUntrackedParameter<bool>("SoftDrop_ON",false);
   theRootFileName = pset.getUntrackedParameter<string>("RootFileName");
   theHLTTag = pset.getUntrackedParameter<string>("HLTTag", "HLT");
-  
+  read_btagSF = pset.getUntrackedParameter<bool>("Read_btagging_SF", false);
+
   minPt = pset.getUntrackedParameter<double>("minPt",25.);
   minGenPt = pset.getUntrackedParameter<double>("minGenPt",15.);
   maxEta = pset.getUntrackedParameter<double>("maxEta",3.);
@@ -776,6 +786,9 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   
   mJECUncFileAK4 = pset.getParameter<std::string>("JECUncFileAK4");
   mJECUncFileAK8 = pset.getParameter<std::string>("JECUncFileAK8");
+
+  mBtagSF_DeepCSV = pset.getParameter<std::string>("BtagSFFile_DeepCSV");
+  mBtagSF_DeepFlav = pset.getParameter<std::string>("BtagSFFile_DeepFlav");
   
   if(isMC){    
     tok_HepMC = consumes<HepMCProduct>(pset.getParameter<edm::InputTag>("Generator"));
@@ -833,6 +846,10 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("hlt_OldMu100",&hlt_OldMu100,"hlt_OldMu100/O");
   T1->Branch("hlt_TkMu100",&hlt_TkMu100,"hlt_TkMu100/O");
   T1->Branch("hlt_DoubleEle25",&hlt_DoubleEle25,"hlt_DoubleEle25/O");
+  T1->Branch("hlt_PFMET250",&hlt_PFMET250,"hlt_PFMET250/O");
+  T1->Branch("hlt_PFMET300",&hlt_PFMET300,"hlt_PFMET300/O");
+  T1->Branch("hlt_PFMET200",&hlt_PFMET200,"hlt_PFMET200/O");
+  T1->Branch("hlt_PFMET200_TypeOne",&hlt_PFMET200_TypeOne,"hlt_PFMET200_TypeOne/O");
   
   T1->Branch("ntrigobjs",&ntrigobjs,"ntrigobjs/I");
   T1->Branch("trigobjpt",trigobjpt,"trigobjpt[ntrigobjs]/F");
@@ -1703,10 +1720,10 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	pfjetAK8tau1[npfjetAK8] = ak8jet.userFloat(tau1);
 	pfjetAK8tau2[npfjetAK8] = ak8jet.userFloat(tau2);
 	pfjetAK8tau3[npfjetAK8] = ak8jet.userFloat(tau3);
+
+	pfjetAK8sdmass[npfjetAK8] = (ak8jet.groomedMass(subjets) > 0)? ak8jet.groomedMass(subjets) : 0;
 	
 	if((ak8jet.subjets(subjets)).size()>1){   ////subjets = "SoftDropPuppi"
-	  
-	  pfjetAK8sdmass[npfjetAK8] = (ak8jet.groomedMass(subjets) > 0)? ak8jet.groomedMass(subjets) : 0;
 	  
 	  TLorentzVector elInsubjet1, elInsubjet2, subjet1_wel, subjet2_wel;
 	  TLorentzVector muInsubjet1, muInsubjet2, subjet1_wmu, subjet2_wmu;
@@ -1785,12 +1802,12 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	      pfjetAK8sub1phi[npfjetAK8] = ak8subjet->phi();
 	      pfjetAK8sub1mass[npfjetAK8] = ak8subjet->mass();	 
 	      pfjetAK8sub1btag[npfjetAK8] = ak8subjet->bDiscriminator("pfDeepCSVJetTags:probb")+ak8subjet->bDiscriminator("pfDeepCSVJetTags:probbb");
-	      pfjetAK8sub1emfrac[npfjetAK8] = emsub*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub1mufrac[npfjetAK8] = musub*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub1phofrac[npfjetAK8] = phosub*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub1chhadfrac[npfjetAK8] = chhad*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub1neuhadfrac[npfjetAK8] = neuhad*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub1hadfrac[npfjetAK8] = (chhad+neuhad)*1./max(1e-6,(double)ak8subjet->energy());
+	      pfjetAK8sub1emfrac[npfjetAK8] = emsub*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub1mufrac[npfjetAK8] = musub*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub1phofrac[npfjetAK8] = phosub*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub1chhadfrac[npfjetAK8] = chhad*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub1neuhadfrac[npfjetAK8] = neuhad*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub1hadfrac[npfjetAK8] = (chhad+neuhad)*1./ak8subjet->correctedP4("Uncorrected").energy();
 	    }
 	    else if(isub==1){
 	      
@@ -1799,12 +1816,12 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	      pfjetAK8sub2phi[npfjetAK8] = ak8subjet->phi();
 	      pfjetAK8sub2mass[npfjetAK8] = ak8subjet->mass();	 
 	      pfjetAK8sub2btag[npfjetAK8] = ak8subjet->bDiscriminator("pfDeepCSVJetTags:probb")+ak8subjet->bDiscriminator("pfDeepCSVJetTags:probbb");
-	      pfjetAK8sub2emfrac[npfjetAK8] = emsub*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub2mufrac[npfjetAK8] = musub*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub2phofrac[npfjetAK8] = phosub*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub2chhadfrac[npfjetAK8] = chhad*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub2neuhadfrac[npfjetAK8] = neuhad*1./max(1e-6,(double)ak8subjet->energy());
-	      pfjetAK8sub2hadfrac[npfjetAK8] = (chhad+neuhad)*1./max(1e-6,(double)ak8subjet->energy());
+	      pfjetAK8sub2emfrac[npfjetAK8] = emsub*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub2mufrac[npfjetAK8] = musub*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub2phofrac[npfjetAK8] = phosub*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub2chhadfrac[npfjetAK8] = chhad*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub2neuhadfrac[npfjetAK8] = neuhad*1./ak8subjet->correctedP4("Uncorrected").energy();
+	      pfjetAK8sub2hadfrac[npfjetAK8] = (chhad+neuhad)*1./ak8subjet->correctedP4("Uncorrected").energy();
 	    }	  
 	  }
 	  
@@ -2044,10 +2061,6 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
     std::vector<TLorentzVector> tlvel;
     int iE1 = 0;                                                                                                                                       
     for(const auto& electron1 : iEvent.get(tok_electrons_) ) {                                                                                         
-      elmvaid[nelecs] = electron1.electronID(melectronID_isowp90);                                                                                 
-      elmvaid_noIso[nelecs] = electron1.electronID(melectronID_noisowp90);                                                                             
-      elmvaid_Fallv2WP80[nelecs] = electron1.electronID(melectronID_isowp80);                                                                                 
-      elmvaid_Fallv2WP80_noIso[nelecs] = electron1.electronID(melectronID_noisowp80);                                                                             
       GsfTrackRef gsftrk1 = electron1.gsfTrack();                                                                                                      
       if (gsftrk1.isNull()) continue;                                                                                                                  
       TrackRef ctftrk = electron1.closestCtfTrackRef();                                                                                                
@@ -2055,7 +2068,11 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       iE1++;                                                                                                                                           
       //if (tmpelectron1.perp()<10.0) continue;                                                                                                        
       if (electron1.pt()<10.0) continue;                                                                                                               
-      if (gsftrk1->ndof() <9) continue;                                                                                                                
+      if (gsftrk1->ndof() <9) continue;
+      elmvaid[nelecs] = electron1.electronID(melectronID_isowp90);                                                                                 
+      elmvaid_noIso[nelecs] = electron1.electronID(melectronID_noisowp90);                                                                             
+      elmvaid_Fallv2WP80[nelecs] = electron1.electronID(melectronID_isowp80);                                                                                 
+      elmvaid_Fallv2WP80_noIso[nelecs] = electron1.electronID(melectronID_noisowp80);                                                                             
       elsigmaieta[nelecs] = electron1.full5x5_sigmaIetaIeta();                                                                                         
       elsigmaiphi[nelecs] = electron1.full5x5_sigmaIphiIphi();                                                                                         
       elr9full[nelecs] = electron1.full5x5_r9();                                                                                                       
@@ -2230,6 +2247,28 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       }
       
       pfjetAK4JEC[npfjetAK4] = total_cor;
+
+      pfjetAK4hadronflav[npfjetAK4] = ak4jet.hadronFlavour();
+      pfjetAK4partonflav[npfjetAK4] = ak4jet.partonFlavour();
+      
+      pfjetAK4qgl[npfjetAK4] = ak4jet.userFloat("QGTagger:qgLikelihood");
+      pfjetAK4PUID[npfjetAK4] = ak4jet.userFloat("pileupJetId:fullDiscriminant");
+      
+      BTagEntry::JetFlavor btv_flav;
+      if(abs(pfjetAK4hadronflav[npfjetAK4])==5){ btv_flav = BTagEntry::FLAV_B; }
+      else if (abs(pfjetAK4hadronflav[npfjetAK4])==4){ btv_flav = BTagEntry::FLAV_C; }
+      else { btv_flav = BTagEntry::FLAV_UDSG; }
+      
+      if(read_btagSF){
+	
+	pfjetAK4btag_DeepCSV_SF[npfjetAK4] = reader_deepcsv.eval_auto_bounds("central",btv_flav,fabs(pfjetAK44v.Eta()),tmprecpt); 
+	pfjetAK4btag_DeepCSV_SF_up[npfjetAK4] = reader_deepcsv.eval_auto_bounds("up",btv_flav,fabs(pfjetAK44v.Eta()),tmprecpt);
+	pfjetAK4btag_DeepCSV_SF_dn[npfjetAK4] = reader_deepcsv.eval_auto_bounds("down",btv_flav,fabs(pfjetAK44v.Eta()),tmprecpt);
+	
+	pfjetAK4btag_DeepFlav_SF[npfjetAK4] = reader_deepflav.eval_auto_bounds("central",btv_flav,fabs(pfjetAK44v.Eta()),tmprecpt); 
+	pfjetAK4btag_DeepFlav_SF_up[npfjetAK4] = reader_deepflav.eval_auto_bounds("up",btv_flav,fabs(pfjetAK44v.Eta()),tmprecpt);
+	pfjetAK4btag_DeepFlav_SF_dn[npfjetAK4] = reader_deepflav.eval_auto_bounds("down",btv_flav,fabs(pfjetAK44v.Eta()),tmprecpt);
+      }
       
       if(isMC){
 	
@@ -2340,12 +2379,6 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       
       pfjetAK4jetID[npfjetAK4] = getJetID(AK4idvars,"CHS",year,pfjetAK4eta[npfjetAK4],false,isUltraLegacy);
       pfjetAK4jetID_tightlepveto[npfjetAK4] = getJetID(AK4idvars,"CHS",year,pfjetAK4eta[npfjetAK4],true,isUltraLegacy);
-      
-      pfjetAK4hadronflav[npfjetAK4] = ak4jet.hadronFlavour();
-      pfjetAK4partonflav[npfjetAK4] = ak4jet.partonFlavour();
-      
-      pfjetAK4qgl[npfjetAK4] = ak4jet.userFloat("QGTagger:qgLikelihood");
-      pfjetAK4PUID[npfjetAK4] = ak4jet.userFloat("pileupJetId:fullDiscriminant");
       
       npfjetAK4++;	
       if(npfjetAK4 >= njetmx) { break;}
@@ -2830,6 +2863,22 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
     case 11 :
       hlt_DoubleEle25 = booltrg[jk];
       break;
+
+    case 12 :
+      hlt_PFMET250 = booltrg[jk];
+      break;
+      
+    case 13 :
+      hlt_PFMET300 = booltrg[jk];
+      break;
+
+    case 14 :
+      hlt_PFMET200 = booltrg[jk];
+      break;
+
+    case 15 :
+      hlt_PFMET200_TypeOne = booltrg[jk];
+      break;
     }
   }	  
   //  cout<<"done!"<<endl;
@@ -2897,7 +2946,23 @@ Leptop::beginJob()
     vsrcAK8.push_back(unc1);
   }
   
+  if(read_btagSF){
+	calib_deepcsv = BTagCalibration("DeepCSV", mBtagSF_DeepCSV.c_str());
+	reader_deepcsv = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"}); 
+	reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_B, "comb");
+	reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_C, "comb");
+	reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_UDSG, "incl");
   
+	calib_deepflav = BTagCalibration("DeepJet", mBtagSF_DeepFlav.c_str());
+	reader_deepflav = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"}); 
+	reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_B, "comb");
+	reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_C, "comb");
+	reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_UDSG, "incl");
+  }
+
+   //**Important**//
+  //For precision top physics, change "comb" to "mujets" in BTagCalibrationReader above //
+  //https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL18#Additional_information
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
