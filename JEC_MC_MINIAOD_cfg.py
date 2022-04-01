@@ -143,6 +143,8 @@ process.mcjets =  cms.EDAnalyzer('Leptop',
 	 isReco = cms.untracked.bool(True),
  	 ReRECO = cms.untracked.bool(True),
 	 SoftDrop_ON =  cms.untracked.bool(True),
+         store_electron_scalnsmear = cms.untracked.bool(True),
+       	 add_prefireweights =  cms.untracked.bool(True),
  	 RootFileName = cms.untracked.string('rootuple_jerc_l5.root'),  #largest data till April5,2016
 
 	 softdropmass  = cms.untracked.string("ak8PFJetsSoftDropMass"),#ak8PFJetsPuppiSoftDropMass"),#('ak8PFJetsPuppiSoftDropMass'),
@@ -168,6 +170,7 @@ process.mcjets =  cms.EDAnalyzer('Leptop',
          SecondaryVertices = cms.InputTag("slimmedSecondaryVertices"),
 	 slimmedAddPileupInfo = cms.InputTag("slimmedAddPileupInfo"),
 	 PFMet = cms.InputTag("slimmedMETs"),
+         PuppiMet = cms.InputTag("slimmedMETsPuppi"),
     	 GENMet  = cms.InputTag("genMetTrue","","SIM"),
          Generator = cms.InputTag("generator"),
   	
@@ -217,6 +220,7 @@ process.mcjets =  cms.EDAnalyzer('Leptop',
 
          BtagSFFile_DeepCSV = cms.string("BtagRecommendation106XUL18/DeepCSV_106XUL18SF_V1p1.csv"),
 	 BtagSFFile_DeepFlav = cms.string("BtagRecommendation106XUL18/DeepJet_106XUL18SF_V1p1.csv"),
+         RochcorFolder = cms.string("roccor.Run2.v5/"),
 
 	 bits = cms.InputTag("TriggerResults","","HLT"),
          prescales = cms.InputTag("patTrigger","","RECO"),
