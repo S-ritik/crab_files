@@ -46,6 +46,7 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourInfo.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
@@ -132,6 +133,10 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondFormats/BTauObjects/interface/BTagEntry.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 #include "fastjet/Selector.hh"
 #include "fastjet/PseudoJet.hh"
 #include "fastjet/JetDefinition.hh"
@@ -532,7 +537,9 @@ private:
   
 
   bool pfjetAK4jetID[njetmx], pfjetAK4jetID_tightlepveto[njetmx];
-  
+
+  float pfjetAK4btag_DeepCSV_SF[njetmx], pfjetAK4btag_DeepCSV_SF_up[njetmx], pfjetAK4btag_DeepCSV_SF_dn[njetmx];
+  float pfjetAK4btag_DeepFlav_SF[njetmx], pfjetAK4btag_DeepFlav_SF_up[njetmx], pfjetAK4btag_DeepFlav_SF_dn[njetmx];
   float pfjetAK4reso[njetmx], pfjetAK4resoup[njetmx], pfjetAK4resodn[njetmx];
   
   float pfjetAK4JEC[njetmx];
@@ -638,9 +645,7 @@ private:
     const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele32_WPTight_Gsf_v","HLT_Ele20_WPLoose_Gsf_v","HLT_Ele300_CaloIdVT_GsfTrkIdT","HLT_AK8PFJet420_TrimMass30_v","HLT_AK8PFHT900_TrimMass50_v","HLT_PFJet500_v","HLT_AK8PFJet500_v","HLT_PFHT1050_v","HLT_AK8PFHT750_TrimMass50_v","HLT_AK8PFHT800_TrimMass50_v","HLT_AK8PFHT850_TrimMass50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v","HLT_DoubleEle33_CaloIdL_MW_v","HLT_DoubleEle25_CaloIdL_MW_v"};
   */  
   static const int nHLTmx = 16;
-  const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v", "HLT_AK8PFJet500_v", "HLT_Photon200_v", "HLT_Mu37_Ele27_CaloIdL_MW_v", "HLT_Mu27_Ele37_CaloIdL_MW_v", "HLT_Mu37_TkMu27_v", "HLT_OldMu100", "HLT_TkMu100_v", "HLT_DoubleEle25_CaloIdL_MW_v","HLT_PFMET250_HBHECleaned","HLT_PFMET300_HBHECleaned","HLT_PFMET200_HBHE_BeamHaloCleaned","HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned 
-
-"};
+  const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v", "HLT_AK8PFJet500_v", "HLT_Photon200_v", "HLT_Mu37_Ele27_CaloIdL_MW_v", "HLT_Mu27_Ele37_CaloIdL_MW_v", "HLT_Mu37_TkMu27_v", "HLT_OldMu100", "HLT_TkMu100_v", "HLT_DoubleEle25_CaloIdL_MW_v","HLT_PFMET250_HBHECleaned","HLT_PFMET300_HBHECleaned","HLT_PFMET200_HBHE_BeamHaloCleaned","HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned"};
   
   //HLT_AK8PFJet360_TrimMass30_v = > can be added 
   //HLT_Ele20_WPLoose_Gsf_v : this was there till 19th Jan, 2020 as 6th element 
@@ -912,7 +917,6 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("pfjetAK8jesdn_rel",pfjetAK8jesdn_rel,"pfjetAK8jesdn_rel[npfjetAK8]/F");
   T1->Branch("pfjetAK8jesdn_scale",pfjetAK8jesdn_scale,"pfjetAK8jesdn_scale[npfjetAK8]/F");
   T1->Branch("pfjetAK8jesdn_total",pfjetAK8jesdn_total,"pfjetAK8jesdn_total[npfjetAK8]/F");
-  
   T1->Branch("pfjetAK8chrad",pfjetAK8chrad,"pfjetAK8chrad[npfjetAK8]/F");
   T1->Branch("pfjetAK8pTD",pfjetAK8pTD,"pfjetAK8pTD[npfjetAK8]/F");
   
@@ -1000,7 +1004,13 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("pfjetAK4JEC",pfjetAK4JEC,"pfjetAK4JEC[npfjetAK4]/F");
   T1->Branch("pfjetAK4btag_DeepCSV",pfjetAK4btag_DeepCSV,"pfjetAK4btag_DeepCSV[npfjetAK4]/F");
   T1->Branch("pfjetAK4btag_DeepFlav",pfjetAK4btag_DeepFlav,"pfjetAK4btag_DeepFlav[npfjetAK4]/F");
- 
+  T1->Branch("pfjetAK4btag_DeepCSV_SF",pfjetAK4btag_DeepCSV_SF,"pfjetAK4btag_DeepCSV_SF[npfjetAK4]/F");
+  T1->Branch("pfjetAK4btag_DeepCSV_SF_up",pfjetAK4btag_DeepCSV_SF_up,"pfjetAK4btag_DeepCSV_SF_up[npfjetAK4]/F");
+  T1->Branch("pfjetAK4btag_DeepCSV_SF_dn",pfjetAK4btag_DeepCSV_SF_dn,"pfjetAK4btag_DeepCSV_SF_dn[npfjetAK4]/F");
+  T1->Branch("pfjetAK4btag_DeepFlav_SF",pfjetAK4btag_DeepFlav_SF,"pfjetAK4btag_DeepFlav_SF[npfjetAK4]/F");
+  T1->Branch("pfjetAK4btag_DeepFlav_SF_up",pfjetAK4btag_DeepFlav_SF_up,"pfjetAK4btag_DeepFlav_SF_up[npfjetAK4]/F");
+  T1->Branch("pfjetAK4btag_DeepFlav_SF_dn",pfjetAK4btag_DeepFlav_SF_dn,"pfjetAK4btag_DeepFlav_SF_dn[npfjetAK4]/F");
+
   T1->Branch("pfjetAK4reso",pfjetAK4reso,"pfjetAK4reso[npfjetAK4]/F");
   T1->Branch("pfjetAK4resoup",pfjetAK4resoup,"pfjetAK4resoup[npfjetAK4]/F");
   T1->Branch("pfjetAK4resodn",pfjetAK4resodn,"pfjetAK4resodn[npfjetAK4]/F");
@@ -2947,19 +2957,19 @@ Leptop::beginJob()
   }
   
   if(read_btagSF){
-	calib_deepcsv = BTagCalibration("DeepCSV", mBtagSF_DeepCSV.c_str());
-	reader_deepcsv = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"}); 
-	reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_B, "comb");
-	reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_C, "comb");
-	reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_UDSG, "incl");
-  
-	calib_deepflav = BTagCalibration("DeepJet", mBtagSF_DeepFlav.c_str());
-	reader_deepflav = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"}); 
-	reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_B, "comb");
-	reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_C, "comb");
-	reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_UDSG, "incl");
+    calib_deepcsv = BTagCalibration("DeepCSV", mBtagSF_DeepCSV.c_str());
+    reader_deepcsv = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"}); 
+    reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_B, "comb");
+    reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_C, "comb");
+    reader_deepcsv.load(calib_deepcsv, BTagEntry::FLAV_UDSG, "incl");
+    
+    calib_deepflav = BTagCalibration("DeepJet", mBtagSF_DeepFlav.c_str());
+    reader_deepflav = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"}); 
+    reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_B, "comb");
+    reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_C, "comb");
+    reader_deepflav.load(calib_deepflav, BTagEntry::FLAV_UDSG, "incl");
   }
-
+  
    //**Important**//
   //For precision top physics, change "comb" to "mujets" in BTagCalibrationReader above //
   //https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL18#Additional_information

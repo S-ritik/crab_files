@@ -191,7 +191,9 @@ process.mcjets =  cms.EDAnalyzer('Leptop',
          Electrons = cms.InputTag("slimmedElectrons"),#,"","PAT"),#("gsfElectrons"),
          Photons = cms.InputTag("slimmedPhotons"),#,"","PAT"),
 	 GenParticles = cms.InputTag("prunedGenParticles"),#("prunedGenParticles"),#("packedGenParticles"),
-
+         jetFlavourInfos = cms.InputTag("slimmedGenJetsFlavourInfos"),
+	 #jetFlavourInfos = cms.InputTag("genJetAK8FlavourAssociation"),
+                                 
          electronID_isowp90        = cms.string('mvaEleID-Fall17-iso-V2-wp90'),
          electronID_noisowp90      = cms.string('mvaEleID-Fall17-noIso-V2-wp90'),                      
          electronID_isowp80        = cms.string('mvaEleID-Fall17-iso-V2-wp80'),
@@ -212,6 +214,9 @@ process.mcjets =  cms.EDAnalyzer('Leptop',
 
          JECUncFileAK4 = cms.string("Summer19UL18_V5_MC/Summer19UL18_V5_MC_UncertaintySources_AK4PFchs.txt"),
 	 JECUncFileAK8 = cms.string("Summer19UL18_V5_MC/Summer19UL18_V5_MC_UncertaintySources_AK8PFPuppi.txt"),
+
+         BtagSFFile_DeepCSV = cms.string("BtagRecommendation106XUL18/DeepCSV_106XUL18SF_V1p1.csv"),
+	 BtagSFFile_DeepFlav = cms.string("BtagRecommendation106XUL18/DeepJet_106XUL18SF_V1p1.csv"),
 
 	 bits = cms.InputTag("TriggerResults","","HLT"),
          prescales = cms.InputTag("patTrigger","","RECO"),
