@@ -45,7 +45,7 @@ process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 
 from RecoJets.Configuration.GenJetParticles_cff import *
 
-process.GlobalTag.globaltag = "106X_upgrade2018_realistic_v15_L1v1"
+process.GlobalTag.globaltag = "106X_upgrade2018_realistic_v16_L1v1"
 #process.GlobalTag.globaltag = "102X_upgrade2018_realistic_v20"
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:mc', '')
 
@@ -61,7 +61,7 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 inFiles = cms.untracked.vstring(
 #'root://cmsxrootd.fnal.gov//store/mc/RunIIAutumn18MiniAOD/QCD_bEnriched_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/20000/105691C7-8434-2940-88D2-7369139692CB.root'   
-'root://cms-xrd-global.cern.ch//store/mc/RunIISummer19UL18MiniAOD/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v11_L1v1-v2/260000/0112B4DB-39FA-4645-A39D-912087A8C335.root'
+'root://xrootd-cms.infn.it//store/mc/RunIISummer20UL18MiniAODv2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/00000/04A0B676-D63A-6D41-B47F-F4CF8CBE7DB8.root'
 #'/store/mc/RunIISummer19UL18MiniAOD/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v11_L1v1-v2/260000/00C28834-56C0-2343-B436-AA8521756E9E.root'
 #'/store/mc/RunIISummer19UL18MiniAOD/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v11_L1v1-v2/100000/00BC2C64-EBF8-E843-ACC9-A1A2744FE11B.root'
 #'file:/tmp/deroy/00C28834-56C0-2343-B436-AA8521756E9E.root'
@@ -134,6 +134,20 @@ updateJetCollection(
 )
 #process.updatedPatJetsTransientCorrectedSlimmedJetsAK8.userData.userFloats.src = []
 
+# For prefire correction #
+
+from PhysicsTools.PatUtils.l1PrefiringWeightProducer_cfi import l1PrefiringWeightProducer
+process.prefiringweight = l1PrefiringWeightProducer.clone(
+        TheJets = cms.InputTag("slimmedJets"), # ("updatedPatJetsUpdatedJEC"), #this should be the slimmedJets collection with up to date JECs !
+DataEraECAL = cms.string("None"),
+DataEraMuon = cms.string("20172018"),  # For 2018 UL samples... Need to be changes for different year from here https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1PrefiringWeightRecipe
+UseJetEMPt = cms.bool(False),
+PrefiringRateSystematicUnctyECAL = cms.double(0.2),
+PrefiringRateSystematicUnctyMuon = cms.double(0.2)
+)
+
+# Analyzer #
+
 process.mcjets =  cms.EDAnalyzer('Leptop',
 
 	 Data =  cms.untracked.bool(False),
@@ -173,7 +187,8 @@ process.mcjets =  cms.EDAnalyzer('Leptop',
          PuppiMet = cms.InputTag("slimmedMETsPuppi"),
     	 GENMet  = cms.InputTag("genMetTrue","","SIM"),
          Generator = cms.InputTag("generator"),
-  	
+         nPDFsets = cms.untracked.uint32(103),
+
          PFRho = cms.InputTag("fixedGridRhoFastjetAll"),
 
          LHEEventProductInputTag = cms.InputTag('externalLHEProducer'),
@@ -271,6 +286,7 @@ process.jetSeq=cms.Sequence(process.patJetCorrFactorsSlimmedJetsAK8+process.upda
 process.p = cms.Path(process.egmPhotonIDSequence* 
  		     process.HBHENoiseFilterResultProducer*process.HBHENoiseFilterResultProducerNoMinZ*
 		     process.allMetFilterPaths*
+                     process.prefiringweight*
 #		     process.egmGsfElectronIDSequence*
 		     process.jetSeq *
 		     process.mcjets)

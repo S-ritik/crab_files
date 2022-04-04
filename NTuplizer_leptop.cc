@@ -154,7 +154,10 @@
 
 // Rochester correction for muons //
 #include "RoccoR.h"
-#include "RoccoR.cc"
+//#include "RoccoR.cc"
+
+# include <vector>
+
 
 using namespace std;
 using namespace edm;
@@ -303,7 +306,7 @@ bool getJetID(JetIDVars vars, string jettype="CHS", int year=2018, double eta=0,
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID
   
   if (jettype!="CHS" && jettype!="PUPPI"){
-    cout<<"Don't know your jet type"<<endl;
+    cout<<"Don't know your jet type! I know only CHS & PUPPI :D"<<endl;
     return false;
   }
   
@@ -423,7 +426,9 @@ private:
   bool read_btagSF;
   bool add_prefireweights;
   bool store_electron_scalnsmear, store_electron_addvariabs;
-  
+
+  uint nPDFsets;
+
   std::string theRootFileName;
   std::string theHLTTag;
   std::string softdropmass;
@@ -493,7 +498,7 @@ private:
   
   int irunold;
   int irun, ilumi, ifltr, nprim, nprimi, ibrnch;
-  double event_weight;
+  double Generator_weight;
   double weights[njetmx];
   
   double Rho ;
@@ -576,6 +581,8 @@ private:
   int genpartstatus[npartmx], genpartpdg[npartmx], genpartmompdg[npartmx], genpartgrmompdg[npartmx], genpartmomid[npartmx], genpartdaugno[npartmx];
   float genpartpt[npartmx], genparteta[npartmx], genpartphi[npartmx], genpartm[npartmx]; //genpartq[npartmx];
   bool genpartfromhard[npartmx], genpartfromhardbFSR[npartmx], genpartisPromptFinalState[npartmx], genpartisLastCopyBeforeFSR[npartmx];
+
+  float Generator_x1, Generator_x2, Generator_xpdf1,Generator_xpdf2, Generator_id1, Generator_id2, Generator_scalePDF;
   
   static const int nlhemax = 10;
   int nLHEparticles;
@@ -593,6 +600,12 @@ private:
   static const int nalpsmax = 3;
   int nLHEAlpsWeights;
   float LHEAlpsWeights[nalpsmax];
+  
+  static const int nlhepsmax = 8;
+  int nLHEPSWeights;
+  float LHEPSWeights[nlhepsmax];
+  
+  double LHE_weight;
   
   float miset , misphi , sumEt, misetsig;
   float miset_UnclusEup, miset_UnclusEdn;
@@ -850,6 +863,7 @@ Leptop::Leptop(const edm::ParameterSet& pset):
     tok_wt_ = consumes<GenEventInfoProduct>(pset.getParameter<edm::InputTag>("Generator")) ;
     lheEventProductToken_ = consumes<LHEEventProduct>(pset.getParameter<edm::InputTag>("LHEEventProductInputTag")) ;
     pileup_ = consumes<std::vector<PileupSummaryInfo> >(pset.getParameter<edm::InputTag>("slimmedAddPileupInfo"));
+    nPDFsets      = pset.getUntrackedParameter<uint>("nPDFsets", 103);	
   }
 
   if(add_prefireweights){
@@ -886,7 +900,7 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   
   // generator-related info //
   
-  T1->Branch("event_weight", &event_weight, "event_weight/D") ;
+  T1->Branch("Generator_weight", &Generator_weight, "Generator_weight/D") ;
   T1->Branch("qscale",&qscale,"qscale/F");
   T1->Branch("npu_vert",&npu_vert,"npu_vert/I");
   T1->Branch("npu_vert_true",&npu_vert_true,"npu_vert_true/I");
@@ -1117,7 +1131,18 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("pfjetAK4GenMatch",pfjetAK4GenMatch,"pfjetAK4GenMatch/I");
   
   if(isMC){
-  // GEN MET info //    
+   // generator-related info //
+    
+    T1->Branch("Generator_x1",&Generator_x1,"Generator_x1/F");
+    T1->Branch("Generator_x2",&Generator_x2,"Generator_x2/F");
+    T1->Branch("Generator_xpdf1",&Generator_xpdf1,"Generator_xpdf1/F");
+    T1->Branch("Generator_xpdf2",&Generator_xpdf2,"Generator_xpdf2/F");
+    T1->Branch("Generator_id1",&Generator_id1,"Generator_id1/I");
+    T1->Branch("Generator_id2",&Generator_id2,"Generator_id2/I");
+    T1->Branch("Generator_scalePDF",&Generator_scalePDF,"Generator_scalePDF/F");
+ 
+    // GEN MET info //
+    
   T1->Branch("GENMET",&genmiset,"genmiset/F") ;
   T1->Branch("GENMETPhi",&genmisphi,"genmisphi/F") ;
   
@@ -1157,12 +1182,25 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("genparteta",genparteta,"genparteta[ngenparticles]/F");
   T1->Branch("genpartphi",genpartphi,"genpartphi[ngenparticles]/F");
   T1->Branch("genpartm",genpartm,"genpartm[ngenparticles]/F");
+
+    // LHE Info //
+
   T1->Branch("nLHEparticles",&nLHEparticles, "nLHEparticles/I");
   T1->Branch("LHEpartpdg",LHEpartpdg,"LHEpartpdg[nLHEparticles]/I");
   T1->Branch("LHEpartpt",LHEpartpt,"LHEpartpt[nLHEparticles]/F");
   T1->Branch("LHEparteta",LHEparteta,"LHEparteta[nLHEparticles]/F");
   T1->Branch("LHEpartphi",LHEpartphi,"LHEpartphi[nLHEparticles]/F");
   T1->Branch("LHEpartm",LHEpartm,"LHEpartm[nLHEparticles]/F");
+
+  T1->Branch("LHE_weight",&LHE_weight, "LHE_weight/D");
+  T1->Branch("nLHEScaleWeights",&nLHEScaleWeights, "nLHEScaleWeights/I");
+  T1->Branch("LHEScaleWeights",LHEScaleWeights,"LHEScaleWeights[nLHEScaleWeights]/F");
+  T1->Branch("nLHEPDFWeights",&nLHEPDFWeights, "nLHEPDFWeights/I");
+  T1->Branch("LHEPDFWeights",LHEPDFWeights,"LHEPDFWeights[nLHEPDFWeights]/F");
+  T1->Branch("nLHEAlpsWeights",&nLHEAlpsWeights, "nLHEAlpsWeights/I");
+  T1->Branch("LHEAlpsWeights",LHEAlpsWeights,"LHEAlpsWeights[nLHEAlpsWeights]/F");
+  T1->Branch("nLHEPSWeights",&nLHEPSWeights, "nLHEPSWeights/I");
+  T1->Branch("LHEPSWeights",LHEPSWeights,"LHEPSWeights[nLHEPSWeights]/F");
   
   } //isMC
   
@@ -1273,7 +1311,19 @@ Leptop::Leptop(const edm::ParameterSet& pset):
     T1->Branch("Electron_energySigmaUp",Electron_energySigmaUp,"Electron_energySigmaUp[nelecs]/F");
     T1->Branch("Electron_energySigmaDown",Electron_energySigmaDown,"Electron_energySigmaDown[nelecs]/F");
   }
-   
+
+  T2 = new TTree("Events_All", "XtoYH");
+  
+  T2->Branch("ievt", &ievt, "ievt/i");
+  T2->Branch("npu_vert",&npu_vert,"npu_vert/I");
+  T2->Branch("npu_vert_true",&npu_vert_true,"npu_vert_true/I");  
+  if(isMC){
+    
+    T2->Branch("Generator_weight", &Generator_weight, "Generator_weight/D") ;
+    T2->Branch("LHE_weight",&LHE_weight, "LHE_weight/D");
+    
+  }
+  
   Nevt=0;
   ncnt = 0;
   irunold = -1;
@@ -1309,18 +1359,40 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
   
   wtfact = 1.;
   
-  if(isMC){
+    if(isMC){
     edm::Handle<GenEventInfoProduct>eventinfo ;  
     iEvent.getByToken(tok_wt_,eventinfo) ;
+
+    nLHEPSWeights = 0;
     
     if (eventinfo.isValid()){
-       event_weight = eventinfo->weight();
+       Generator_weight = eventinfo->weight();
        qscale = eventinfo->qScale();
-       wtfact *= event_weight; //Debarati : Moved inside according to GMA
+       wtfact *= Generator_weight; //Debarati : Moved inside according to GMA
+
+       // Generator information //
+       Generator_x1 = (*eventinfo->pdf()).x.first;
+       Generator_x2 = (*eventinfo->pdf()).x.second;
+       Generator_id1 = (*eventinfo->pdf()).id.first;
+       Generator_id2 = (*eventinfo->pdf()).id.second;
+       Generator_xpdf1 = (*eventinfo->pdf()).xPDF.first;
+       Generator_xpdf2 = (*eventinfo->pdf()).xPDF.second;
+       Generator_scalePDF = (*eventinfo->pdf()).scalePDF;
+       
+       //cout<<"eventinfo->weights().size() "<<eventinfo->weights().size()<<" GEN weight "<<Generator_weight<<endl;
+        
+       // Parton shower weights //
+       if(eventinfo->weights().size()>2){
+	 for(unsigned int i=2; i<eventinfo->weights().size(); ++i){
+	   LHEPSWeights[nLHEPSWeights] = eventinfo->weights()[i]/eventinfo->weights()[1];
+	   nLHEPSWeights++;
+	   if(nLHEPSWeights >= nlhepsmax) break;
+	 }
+       }
     }
     else
       {
-	event_weight = qscale = wtfact = 0.0;
+	Generator_weight = qscale = wtfact = Generator_x1 = Generator_x2 = Generator_id1 = Generator_id2 = Generator_xpdf1 = Generator_xpdf2 = Generator_scalePDF = 0.0;
       }
     edm::Handle<LHEEventProduct>lheeventinfo ;
     iEvent.getByToken(lheEventProductToken_,lheeventinfo) ;
@@ -1329,7 +1401,11 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       
       const auto & hepeup = lheeventinfo->hepeup();
       const auto & pup = hepeup.PUP;
-      
+
+      nLHEScaleWeights = 0;
+      nLHEPDFWeights = 0;
+      nLHEAlpsWeights = 0;
+    
       nLHEparticles = 0;
       
       for (unsigned int i = 0; i  < pup.size(); ++i) {
@@ -1344,9 +1420,29 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	  if(nLHEparticles>=nlhemax) break;
 	}
       }
+      // LHE-level weights //
+      
+	  LHE_weight = lheeventinfo->originalXWGTUP();
+	  
+	  for ( unsigned int index = 0; index < lheeventinfo->weights().size(); ++index ) {	
+	    //cout<<"Index "<<index+1<<" Id "<<lheeventinfo->weights()[index].id<<" weight "<<lheeventinfo->weights()[index].wgt/lheeventinfo->originalXWGTUP()<<endl;//" muR "<<lheeventinfo->weights()[index].MUR<<" muF "<<lheeventinfo->weights()[index].MUF<<" DYN Scale "<<lheeventinfo->weights()[index].DYN_SCALE<<endl;
+	    if(index<nlhescalemax && nLHEScaleWeights<nlhescalemax){
+	      LHEScaleWeights[nLHEScaleWeights] = lheeventinfo->weights()[index].wgt/lheeventinfo->originalXWGTUP();
+	      nLHEScaleWeights++;
+	    }
+	    if(index>=nlhescalemax && index<(nlhescalemax+nPDFsets)  && nLHEPDFWeights<nlhepdfmax){
+	      LHEPDFWeights[nLHEPDFWeights] = lheeventinfo->weights()[index].wgt/lheeventinfo->originalXWGTUP();
+	      nLHEPDFWeights++;
+	    }
+	    if(index>=(nlhescalemax+nPDFsets) && index<(nlhescalemax+nPDFsets+nalpsmax) && nLHEAlpsWeights<nalpsmax){
+	      LHEAlpsWeights[nLHEAlpsWeights] = lheeventinfo->weights()[index].wgt/lheeventinfo->originalXWGTUP();
+	      nLHEAlpsWeights++;
+	    }
+	  }
+	  
     }
   }
-  
+
   Handle<VertexCollection> primaryVertices;
   iEvent.getByToken(tok_primaryVertices_, primaryVertices);
   reco::Vertex vertex;
@@ -1538,7 +1634,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
   
   // ====== RECO-objects now  ==========//
   
-  // MET //
+    // MET //
     
   miset = misphi = misetsig = sumEt = genmiset = genmisphi = genmisetsig = -1000 ;
   miset_UnclusEup = miset_UnclusEdn = -100;
@@ -2111,7 +2207,9 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 
       edm::Handle<reco::JetFlavourInfoMatchingCollection> jetFlavourInfos;
       iEvent.getByToken(jetFlavourInfosToken_, jetFlavourInfos);
-      
+
+      iEvent.getByToken(tok_genjetAK4s_, genjetAK4s);
+ 
       std::vector<int> partonFlavour_AK4;
       std::vector<uint8_t> hadronFlavour_AK4;
       
@@ -2430,7 +2528,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	  Muon_correctedUp_pt[nmuons] = muonpt[nmuons]*max(rcSF+rcSF_error,float(0.));
 	  Muon_correctedDown_pt[nmuons] = muonpt[nmuons]*max(rcSF-rcSF_error,float(0.));
 			
-	  // End of Rochester correction //  
+	  // End of Rochester correction // 
 	  if (++nmuons>=njetmx) break;                                                                                                                 
 	}                                                                                                                                              
       }                                                                                                                                               
@@ -3127,6 +3225,8 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
   //std::cout << " npfjetAK8 " << npfjetAK8 << std::endl;
    T1->Fill();
   }
+  
+  T2->Fill(); // filling the tree used to get sumofweights
 }
 
 
