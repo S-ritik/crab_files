@@ -138,7 +138,7 @@ updateJetCollection(
 
 from PhysicsTools.PatUtils.l1PrefiringWeightProducer_cfi import l1PrefiringWeightProducer
 process.prefiringweight = l1PrefiringWeightProducer.clone(
-        TheJets = cms.InputTag("slimmedJets"), # ("updatedPatJetsUpdatedJEC"), #this should be the slimmedJets collection with up to date JECs !
+TheJets = cms.InputTag("slimmedJets"), # ("updatedPatJetsUpdatedJEC"), #this should be the slimmedJets collection with up to date JECs !
 DataEraECAL = cms.string("None"),
 DataEraMuon = cms.string("20172018"),  # For 2018 UL samples... Need to be changes for different year from here https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1PrefiringWeightRecipe
 UseJetEMPt = cms.bool(False),
@@ -159,6 +159,7 @@ process.mcjets =  cms.EDAnalyzer('Leptop',
 	 SoftDrop_ON =  cms.untracked.bool(True),
          store_electron_scalnsmear = cms.untracked.bool(True),
        	 add_prefireweights =  cms.untracked.bool(True),
+         Read_btagging_SF = cms.untracked.bool(False),
  	 RootFileName = cms.untracked.string('rootuple_jerc_l5.root'),  #largest data till April5,2016
 
 	 softdropmass  = cms.untracked.string("ak8PFJetsSoftDropMass"),#ak8PFJetsPuppiSoftDropMass"),#('ak8PFJetsPuppiSoftDropMass'),
@@ -283,12 +284,29 @@ process.allMetFilterPaths=cms.Sequence(process.primaryVertexFilter*process.globa
 
 process.jetSeq=cms.Sequence(process.patJetCorrFactorsSlimmedJetsAK8+process.updatedPatJetsSlimmedJetsAK8+process.patJetCorrFactorsTransientCorrectedSlimmedJetsAK8+process.pfDeepBoostedJetTagInfosSlimmedJetsAK8+process.pfMassDecorrelatedDeepBoostedJetTagsSlimmedJetsAK8+process.pfMassDecorrelatedDeepBoostedDiscriminatorsJetTagsSlimmedJetsAK8+process.updatedPatJetsTransientCorrectedSlimmedJetsAK8)
 
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+runMetCorAndUncFromMiniAOD(process,
+                           isData=False,
+                           )
+from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+makePuppiesFromMiniAOD( process, True )
+runMetCorAndUncFromMiniAOD(process,
+                           isData=False,
+                           metType="Puppi",
+                           postfix="Puppi",
+                           jetFlavor="AK4PFPuppi",
+                           )
+process.puppi.useExistingWeights = True
+
 process.p = cms.Path(process.egmPhotonIDSequence* 
  		     process.HBHENoiseFilterResultProducer*process.HBHENoiseFilterResultProducerNoMinZ*
 		     process.allMetFilterPaths*
                      process.prefiringweight*
 #		     process.egmGsfElectronIDSequence*
 		     process.jetSeq *
+                     process.fullPatMetSequence* 
+		     process.puppiMETSequence*
+		     process.fullPatMetSequencePuppi*
 		     process.mcjets)
 
 process.schedule = cms.Schedule(process.p)

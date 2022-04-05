@@ -172,8 +172,18 @@ const float mu_mass = 0.105658;
 const float el_mass = 0.000511;
 const float pival = acos(-1.);
 
-static const int nsrc = 7;
-const char* srcnames[nsrc] = {"SubTotalPileUp","SubTotalRelative","SubTotalPt","SubTotalScale","SubTotalAbsolute","SubTotalMC","Total"};
+static const int nsrc = 24;
+const char* jecsrcnames[nsrc] = {
+	 "AbsoluteStat", "AbsoluteScale","AbsoluteMPFBias", 
+	 "FlavorQCD", "Fragmentation", 
+	 "PileUpDataMC",  "PileUpPtBB", "PileUpPtEC1", "PileUpPtEC2", //"PileUpPtHF",
+	 "PileUpPtRef",
+	 "RelativeFSR", "RelativeJEREC1", "RelativeJEREC2", //"RelativeJERHF",
+	 "RelativePtBB", "RelativePtEC1", "RelativePtEC2", //"RelativePtHF", 
+	 "RelativeBal", "RelativeSample", "RelativeStatEC", "RelativeStatFSR", //"RelativeStatHF", 
+	 "SinglePionECAL", "SinglePionHCAL","TimePtEta",
+	 "Total"
+	};
 const int njecmcmx = 2*nsrc + 1 ;
 const int nomassbins = 200 ;
 double massbins[nomassbins+1] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200}; 
@@ -543,8 +553,32 @@ private:
   
   float pfjetAK8JEC[njetmxAK8];
   float pfjetAK8reso[njetmxAK8], pfjetAK8resoup[njetmxAK8], pfjetAK8resodn[njetmxAK8];
-  float pfjetAK8jesup_pu[njetmx], pfjetAK8jesup_rel[njetmx], pfjetAK8jesup_scale[njetmx], pfjetAK8jesup_total[njetmx], pfjetAK8jesdn_pu[njetmx], pfjetAK8jesdn_rel[njetmx], pfjetAK8jesdn_scale[njetmx], pfjetAK8jesdn_total[njetmx];
-
+  
+  float pfjetAK8jesup_AbsoluteStat[njetmxAK8], pfjetAK8jesdn_AbsoluteStat[njetmxAK8];
+  float pfjetAK8jesup_AbsoluteScale[njetmxAK8], pfjetAK8jesdn_AbsoluteScale[njetmxAK8];
+  float pfjetAK8jesup_AbsoluteMPFBias[njetmxAK8], pfjetAK8jesdn_AbsoluteMPFBias[njetmxAK8];
+  float pfjetAK8jesup_FlavorQCD[njetmxAK8], pfjetAK8jesdn_FlavorQCD[njetmxAK8];
+  float pfjetAK8jesup_Fragmentation[njetmxAK8], pfjetAK8jesdn_Fragmentation[njetmxAK8];
+  float pfjetAK8jesup_PileUpDataMC[njetmxAK8], pfjetAK8jesdn_PileUpDataMC[njetmxAK8];
+  float pfjetAK8jesup_PileUpPtBB[njetmxAK8], pfjetAK8jesdn_PileUpPtBB[njetmxAK8];
+  float pfjetAK8jesup_PileUpPtEC1[njetmxAK8], pfjetAK8jesdn_PileUpPtEC1[njetmxAK8];
+  float pfjetAK8jesup_PileUpPtEC2[njetmxAK8], pfjetAK8jesdn_PileUpPtEC2[njetmxAK8];
+  float pfjetAK8jesup_PileUpPtRef[njetmxAK8], pfjetAK8jesdn_PileUpPtRef[njetmxAK8];
+  float pfjetAK8jesup_RelativeFSR[njetmxAK8], pfjetAK8jesdn_RelativeFSR[njetmxAK8];
+  float pfjetAK8jesup_RelativeJEREC1[njetmxAK8], pfjetAK8jesdn_RelativeJEREC1[njetmxAK8];
+  float pfjetAK8jesup_RelativeJEREC2[njetmxAK8], pfjetAK8jesdn_RelativeJEREC2[njetmxAK8];
+  float pfjetAK8jesup_RelativePtBB[njetmxAK8], pfjetAK8jesdn_RelativePtBB[njetmxAK8];
+  float pfjetAK8jesup_RelativePtEC1[njetmxAK8], pfjetAK8jesdn_RelativePtEC1[njetmxAK8];
+  float pfjetAK8jesup_RelativePtEC2[njetmxAK8], pfjetAK8jesdn_RelativePtEC2[njetmxAK8];
+  float pfjetAK8jesup_RelativeBal[njetmxAK8], pfjetAK8jesdn_RelativeBal[njetmxAK8];
+  float pfjetAK8jesup_RelativeSample[njetmxAK8], pfjetAK8jesdn_RelativeSample[njetmxAK8];
+  float pfjetAK8jesup_RelativeStatEC[njetmxAK8], pfjetAK8jesdn_RelativeStatEC[njetmxAK8];
+  float pfjetAK8jesup_RelativeStatFSR[njetmxAK8], pfjetAK8jesdn_RelativeStatFSR[njetmxAK8];
+  float pfjetAK8jesup_SinglePionECAL[njetmxAK8], pfjetAK8jesdn_SinglePionECAL[njetmxAK8];
+  float pfjetAK8jesup_SinglePionHCAL[njetmxAK8], pfjetAK8jesdn_SinglePionHCAL[njetmxAK8];
+  float pfjetAK8jesup_TimePtEta[njetmxAK8], pfjetAK8jesdn_TimePtEta[njetmxAK8];
+  float pfjetAK8jesup_Total[njetmxAK8], pfjetAK8jesdn_Total[njetmxAK8];
+  
   int npfjetAK4;
   float pfjetAK4pt[njetmx], pfjetAK4eta[njetmx], pfjetAK4y[njetmx], pfjetAK4phi[njetmx], pfjetAK4mass[njetmx];
  
@@ -560,7 +594,31 @@ private:
   float pfjetAK4reso[njetmx], pfjetAK4resoup[njetmx], pfjetAK4resodn[njetmx];
   
   float pfjetAK4JEC[njetmx];
-  float pfjetAK4jesup_pu[njetmx], pfjetAK4jesup_rel[njetmx], pfjetAK4jesup_scale[njetmx], pfjetAK4jesup_total[njetmx], pfjetAK4jesdn_pu[njetmx], pfjetAK4jesdn_rel[njetmx], pfjetAK4jesdn_scale[njetmx], pfjetAK4jesdn_total[njetmx];
+
+  float pfjetAK4jesup_AbsoluteStat[njetmx], pfjetAK4jesdn_AbsoluteStat[njetmx];
+  float pfjetAK4jesup_AbsoluteScale[njetmx], pfjetAK4jesdn_AbsoluteScale[njetmx];
+  float pfjetAK4jesup_AbsoluteMPFBias[njetmx], pfjetAK4jesdn_AbsoluteMPFBias[njetmx];
+  float pfjetAK4jesup_FlavorQCD[njetmx], pfjetAK4jesdn_FlavorQCD[njetmx];
+  float pfjetAK4jesup_Fragmentation[njetmx], pfjetAK4jesdn_Fragmentation[njetmx];
+  float pfjetAK4jesup_PileUpDataMC[njetmx], pfjetAK4jesdn_PileUpDataMC[njetmx];
+  float pfjetAK4jesup_PileUpPtBB[njetmx], pfjetAK4jesdn_PileUpPtBB[njetmx];
+  float pfjetAK4jesup_PileUpPtEC1[njetmx], pfjetAK4jesdn_PileUpPtEC1[njetmx];
+  float pfjetAK4jesup_PileUpPtEC2[njetmx], pfjetAK4jesdn_PileUpPtEC2[njetmx];
+  float pfjetAK4jesup_PileUpPtRef[njetmx], pfjetAK4jesdn_PileUpPtRef[njetmx];
+  float pfjetAK4jesup_RelativeFSR[njetmx], pfjetAK4jesdn_RelativeFSR[njetmx];
+  float pfjetAK4jesup_RelativeJEREC1[njetmx], pfjetAK4jesdn_RelativeJEREC1[njetmx];
+  float pfjetAK4jesup_RelativeJEREC2[njetmx], pfjetAK4jesdn_RelativeJEREC2[njetmx];
+  float pfjetAK4jesup_RelativePtBB[njetmx], pfjetAK4jesdn_RelativePtBB[njetmx];
+  float pfjetAK4jesup_RelativePtEC1[njetmx], pfjetAK4jesdn_RelativePtEC1[njetmx];
+  float pfjetAK4jesup_RelativePtEC2[njetmx], pfjetAK4jesdn_RelativePtEC2[njetmx];
+  float pfjetAK4jesup_RelativeBal[njetmx], pfjetAK4jesdn_RelativeBal[njetmx];
+  float pfjetAK4jesup_RelativeSample[njetmx], pfjetAK4jesdn_RelativeSample[njetmx];
+  float pfjetAK4jesup_RelativeStatEC[njetmx], pfjetAK4jesdn_RelativeStatEC[njetmx];
+  float pfjetAK4jesup_RelativeStatFSR[njetmx], pfjetAK4jesdn_RelativeStatFSR[njetmx];
+  float pfjetAK4jesup_SinglePionECAL[njetmx], pfjetAK4jesdn_SinglePionECAL[njetmx];
+  float pfjetAK4jesup_SinglePionHCAL[njetmx], pfjetAK4jesdn_SinglePionHCAL[njetmx];
+  float pfjetAK4jesup_TimePtEta[njetmx], pfjetAK4jesdn_TimePtEta[njetmx];
+  float pfjetAK4jesup_Total[njetmx], pfjetAK4jesdn_Total[njetmx];
   
   int pfjetAK4hadronflav[njetmx], pfjetAK4partonflav[njetmx];
   int pfjetAK4Ncons[njetmx];
@@ -1005,20 +1063,59 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("pfjetAK8Neucons",pfjetAK8Neucons,"pfjetAK8Neucons[npfjetAK8]/I");
   T1->Branch("pfjetAK8Chcons",pfjetAK8Chcons,"pfjetAK8Chcons[npfjetAK8]/I");
   
-  T1->Branch("pfjetAK8reso",pfjetAK8reso,"pfjetAK8reso[npfjetAK8]/F");
-  T1->Branch("pfjetAK8resoup",pfjetAK8resoup,"pfjetAK8resoup[npfjetAK8]/F");
-  T1->Branch("pfjetAK8resodn",pfjetAK8resodn,"pfjetAK8resodn[npfjetAK8]/F");
+  T1->Branch("pfjetAK8JER",pfjetAK8reso,"pfjetAK8reso[npfjetAK8]/F");
+  T1->Branch("pfjetAK8JERup",pfjetAK8resoup,"pfjetAK8resoup[npfjetAK8]/F");
+  T1->Branch("pfjetAK8JERdn",pfjetAK8resodn,"pfjetAK8resodn[npfjetAK8]/F");
   
-  T1->Branch("pfjetAK8jesup_pu",pfjetAK8jesup_pu,"pfjetAK8jesup_pu[npfjetAK8]/F");
-  T1->Branch("pfjetAK8jesup_rel",pfjetAK8jesup_rel,"pfjetAK8jesup_rel[npfjetAK8]/F");
-  T1->Branch("pfjetAK8jesup_scale",pfjetAK8jesup_scale,"pfjetAK8jesup_scale[npfjetAK8]/F");
-  T1->Branch("pfjetAK8jesup_total",pfjetAK8jesup_total,"pfjetAK8jesup_total[npfjetAK8]/F");
-  T1->Branch("pfjetAK8jesdn_pu",pfjetAK8jesdn_pu,"pfjetAK8jesdn_pu[npfjetAK8]/F");
-  T1->Branch("pfjetAK8jesdn_rel",pfjetAK8jesdn_rel,"pfjetAK8jesdn_rel[npfjetAK8]/F");
-  T1->Branch("pfjetAK8jesdn_scale",pfjetAK8jesdn_scale,"pfjetAK8jesdn_scale[npfjetAK8]/F");
-  T1->Branch("pfjetAK8jesdn_total",pfjetAK8jesdn_total,"pfjetAK8jesdn_total[npfjetAK8]/F");
-  T1->Branch("pfjetAK8chrad",pfjetAK8chrad,"pfjetAK8chrad[npfjetAK8]/F");
-  T1->Branch("pfjetAK8pTD",pfjetAK8pTD,"pfjetAK8pTD[npfjetAK8]/F");
+T1->Branch("pfjetAK8jesup_AbsoluteStat",pfjetAK8jesup_AbsoluteStat,"pfjetAK8jesup_AbsoluteStat[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_AbsoluteScale",pfjetAK8jesup_AbsoluteScale,"pfjetAK8jesup_AbsoluteScale[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_AbsoluteMPFBias",pfjetAK8jesup_AbsoluteMPFBias,"pfjetAK8jesup_AbsoluteMPFBias[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_FlavorQCD",pfjetAK8jesup_FlavorQCD,"pfjetAK8jesup_FlavorQCD[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_Fragmentation",pfjetAK8jesup_Fragmentation,"pfjetAK8jesup_Fragmentation[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_PileUpDataMC",pfjetAK8jesup_PileUpDataMC,"pfjetAK8jesup_PileUpDataMC[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_PileUpPtBB",pfjetAK8jesup_PileUpPtBB,"pfjetAK8jesup_PileUpPtBB[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_PileUpPtEC1",pfjetAK8jesup_PileUpPtEC1,"pfjetAK8jesup_PileUpPtEC1[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_PileUpPtEC2",pfjetAK8jesup_PileUpPtEC2,"pfjetAK8jesup_PileUpPtEC2[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_PileUpPtRef",pfjetAK8jesup_PileUpPtRef,"pfjetAK8jesup_PileUpPtRef[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativeFSR",pfjetAK8jesup_RelativeFSR,"pfjetAK8jesup_RelativeFSR[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativeJEREC1",pfjetAK8jesup_RelativeJEREC1,"pfjetAK8jesup_RelativeJEREC1[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativeJEREC2",pfjetAK8jesup_RelativeJEREC2,"pfjetAK8jesup_RelativeJEREC2[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativePtBB",pfjetAK8jesup_RelativePtBB,"pfjetAK8jesup_RelativePtBB[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativePtEC1",pfjetAK8jesup_RelativePtEC1,"pfjetAK8jesup_RelativePtEC1[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativePtEC2",pfjetAK8jesup_RelativePtEC2,"pfjetAK8jesup_RelativePtEC2[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativeBal",pfjetAK8jesup_RelativeBal,"pfjetAK8jesup_RelativeBal[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativeSample",pfjetAK8jesup_RelativeSample,"pfjetAK8jesup_RelativeSample[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativeStatEC",pfjetAK8jesup_RelativeStatEC,"pfjetAK8jesup_RelativeStatEC[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_RelativeStatFSR",pfjetAK8jesup_RelativeStatFSR,"pfjetAK8jesup_RelativeStatFSR[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_SinglePionECAL",pfjetAK8jesup_SinglePionECAL,"pfjetAK8jesup_SinglePionECAL[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_SinglePionHCAL",pfjetAK8jesup_SinglePionHCAL,"pfjetAK8jesup_SinglePionHCAL[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_TimePtEta",pfjetAK8jesup_TimePtEta,"pfjetAK8jesup_TimePtEta[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesup_Total",pfjetAK8jesup_Total,"pfjetAK8jesup_Total[npfjetAK8]/F");
+  
+  T1->Branch("pfjetAK8jesdn_AbsoluteStat",pfjetAK8jesdn_AbsoluteStat,"pfjetAK8jesdn_AbsoluteStat[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_AbsoluteScale",pfjetAK8jesdn_AbsoluteScale,"pfjetAK8jesdn_AbsoluteScale[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_AbsoluteMPFBias",pfjetAK8jesdn_AbsoluteMPFBias,"pfjetAK8jesdn_AbsoluteMPFBias[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_FlavorQCD",pfjetAK8jesdn_FlavorQCD,"pfjetAK8jesdn_FlavorQCD[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_Fragmentation",pfjetAK8jesdn_Fragmentation,"pfjetAK8jesdn_Fragmentation[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_PileUpDataMC",pfjetAK8jesdn_PileUpDataMC,"pfjetAK8jesdn_PileUpDataMC[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_PileUpPtBB",pfjetAK8jesdn_PileUpPtBB,"pfjetAK8jesdn_PileUpPtBB[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_PileUpPtEC1",pfjetAK8jesdn_PileUpPtEC1,"pfjetAK8jesdn_PileUpPtEC1[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_PileUpPtEC2",pfjetAK8jesdn_PileUpPtEC2,"pfjetAK8jesdn_PileUpPtEC2[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_PileUpPtRef",pfjetAK8jesdn_PileUpPtRef,"pfjetAK8jesdn_PileUpPtRef[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativeFSR",pfjetAK8jesdn_RelativeFSR,"pfjetAK8jesdn_RelativeFSR[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativeJEREC1",pfjetAK8jesdn_RelativeJEREC1,"pfjetAK8jesdn_RelativeJEREC1[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativeJEREC2",pfjetAK8jesdn_RelativeJEREC2,"pfjetAK8jesdn_RelativeJEREC2[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativePtBB",pfjetAK8jesdn_RelativePtBB,"pfjetAK8jesdn_RelativePtBB[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativePtEC1",pfjetAK8jesdn_RelativePtEC1,"pfjetAK8jesdn_RelativePtEC1[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativePtEC2",pfjetAK8jesdn_RelativePtEC2,"pfjetAK8jesdn_RelativePtEC2[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativeBal",pfjetAK8jesdn_RelativeBal,"pfjetAK8jesdn_RelativeBal[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativeSample",pfjetAK8jesdn_RelativeSample,"pfjetAK8jesdn_RelativeSample[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativeStatEC",pfjetAK8jesdn_RelativeStatEC,"pfjetAK8jesdn_RelativeStatEC[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_RelativeStatFSR",pfjetAK8jesdn_RelativeStatFSR,"pfjetAK8jesdn_RelativeStatFSR[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_SinglePionECAL",pfjetAK8jesdn_SinglePionECAL,"pfjetAK8jesdn_SinglePionECAL[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_SinglePionHCAL",pfjetAK8jesdn_SinglePionHCAL,"pfjetAK8jesdn_SinglePionHCAL[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_TimePtEta",pfjetAK8jesdn_TimePtEta,"pfjetAK8jesdn_TimePtEta[npfjetAK8]/F");
+  T1->Branch("pfjetAK8jesdn_Total",pfjetAK8jesdn_Total,"pfjetAK8jesdn_Total[npfjetAK8]/F");
   
   T1->Branch("pfjetAK8sdmass",pfjetAK8sdmass,"pfjetAK8sdmass[npfjetAK8]/F");
   T1->Branch("pfjetAK8tau1",pfjetAK8tau1,"pfjetAK8tau1[npfjetAK8]/F");
@@ -1111,18 +1208,60 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("pfjetAK4btag_DeepFlav_SF_up",pfjetAK4btag_DeepFlav_SF_up,"pfjetAK4btag_DeepFlav_SF_up[npfjetAK4]/F");
   T1->Branch("pfjetAK4btag_DeepFlav_SF_dn",pfjetAK4btag_DeepFlav_SF_dn,"pfjetAK4btag_DeepFlav_SF_dn[npfjetAK4]/F");
 
-  T1->Branch("pfjetAK4reso",pfjetAK4reso,"pfjetAK4reso[npfjetAK4]/F");
-  T1->Branch("pfjetAK4resoup",pfjetAK4resoup,"pfjetAK4resoup[npfjetAK4]/F");
-  T1->Branch("pfjetAK4resodn",pfjetAK4resodn,"pfjetAK4resodn[npfjetAK4]/F");
+  T1->Branch("pfjetAK4JER",pfjetAK4reso,"pfjetAK4reso[npfjetAK4]/F");
+  T1->Branch("pfjetAK4JERup",pfjetAK4resoup,"pfjetAK4resoup[npfjetAK4]/F");
+  T1->Branch("pfjetAK4JERdn",pfjetAK4resodn,"pfjetAK4resodn[npfjetAK4]/F");
+
+  T1->Branch("pfjetAK4jesup_AbsoluteStat",pfjetAK4jesup_AbsoluteStat,"pfjetAK4jesup_AbsoluteStat[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_AbsoluteScale",pfjetAK4jesup_AbsoluteScale,"pfjetAK4jesup_AbsoluteScale[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_AbsoluteMPFBias",pfjetAK4jesup_AbsoluteMPFBias,"pfjetAK4jesup_AbsoluteMPFBias[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_FlavorQCD",pfjetAK4jesup_FlavorQCD,"pfjetAK4jesup_FlavorQCD[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_Fragmentation",pfjetAK4jesup_Fragmentation,"pfjetAK4jesup_Fragmentation[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_PileUpDataMC",pfjetAK4jesup_PileUpDataMC,"pfjetAK4jesup_PileUpDataMC[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_PileUpPtBB",pfjetAK4jesup_PileUpPtBB,"pfjetAK4jesup_PileUpPtBB[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_PileUpPtEC1",pfjetAK4jesup_PileUpPtEC1,"pfjetAK4jesup_PileUpPtEC1[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_PileUpPtEC2",pfjetAK4jesup_PileUpPtEC2,"pfjetAK4jesup_PileUpPtEC2[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_PileUpPtRef",pfjetAK4jesup_PileUpPtRef,"pfjetAK4jesup_PileUpPtRef[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativeFSR",pfjetAK4jesup_RelativeFSR,"pfjetAK4jesup_RelativeFSR[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativeJEREC1",pfjetAK4jesup_RelativeJEREC1,"pfjetAK4jesup_RelativeJEREC1[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativeJEREC2",pfjetAK4jesup_RelativeJEREC2,"pfjetAK4jesup_RelativeJEREC2[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativePtBB",pfjetAK4jesup_RelativePtBB,"pfjetAK4jesup_RelativePtBB[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativePtEC1",pfjetAK4jesup_RelativePtEC1,"pfjetAK4jesup_RelativePtEC1[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativePtEC2",pfjetAK4jesup_RelativePtEC2,"pfjetAK4jesup_RelativePtEC2[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativeBal",pfjetAK4jesup_RelativeBal,"pfjetAK4jesup_RelativeBal[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativeSample",pfjetAK4jesup_RelativeSample,"pfjetAK4jesup_RelativeSample[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativeStatEC",pfjetAK4jesup_RelativeStatEC,"pfjetAK4jesup_RelativeStatEC[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_RelativeStatFSR",pfjetAK4jesup_RelativeStatFSR,"pfjetAK4jesup_RelativeStatFSR[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_SinglePionECAL",pfjetAK4jesup_SinglePionECAL,"pfjetAK4jesup_SinglePionECAL[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_SinglePionHCAL",pfjetAK4jesup_SinglePionHCAL,"pfjetAK4jesup_SinglePionHCAL[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_TimePtEta",pfjetAK4jesup_TimePtEta,"pfjetAK4jesup_TimePtEta[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesup_Total",pfjetAK4jesup_Total,"pfjetAK4jesup_Total[npfjetAK4]/F");
   
-  T1->Branch("pfjetAK4jesup_pu",pfjetAK4jesup_pu,"pfjetAK4jesup_pu[npfjetAK4]/F");
-  T1->Branch("pfjetAK4jesup_rel",pfjetAK4jesup_rel,"pfjetAK4jesup_rel[npfjetAK4]/F");
-  T1->Branch("pfjetAK4jesup_scale",pfjetAK4jesup_scale,"pfjetAK4jesup_scale[npfjetAK4]/F");
-  T1->Branch("pfjetAK4jesup_total",pfjetAK4jesup_total,"pfjetAK4jesup_total[npfjetAK4]/F");
-  T1->Branch("pfjetAK4jesdn_pu",pfjetAK4jesdn_pu,"pfjetAK4jesdn_pu[npfjetAK4]/F");
-  T1->Branch("pfjetAK4jesdn_rel",pfjetAK4jesdn_rel,"pfjetAK4jesdn_rel[npfjetAK4]/F");
-  T1->Branch("pfjetAK4jesdn_scale",pfjetAK4jesdn_scale,"pfjetAK4jesdn_scale[npfjetAK4]/F");
-  T1->Branch("pfjetAK4jesdn_total",pfjetAK4jesdn_total,"pfjetAK4jesdn_total[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_AbsoluteStat",pfjetAK4jesdn_AbsoluteStat,"pfjetAK4jesdn_AbsoluteStat[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_AbsoluteScale",pfjetAK4jesdn_AbsoluteScale,"pfjetAK4jesdn_AbsoluteScale[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_AbsoluteMPFBias",pfjetAK4jesdn_AbsoluteMPFBias,"pfjetAK4jesdn_AbsoluteMPFBias[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_FlavorQCD",pfjetAK4jesdn_FlavorQCD,"pfjetAK4jesdn_FlavorQCD[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_Fragmentation",pfjetAK4jesdn_Fragmentation,"pfjetAK4jesdn_Fragmentation[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_PileUpDataMC",pfjetAK4jesdn_PileUpDataMC,"pfjetAK4jesdn_PileUpDataMC[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_PileUpPtBB",pfjetAK4jesdn_PileUpPtBB,"pfjetAK4jesdn_PileUpPtBB[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_PileUpPtEC1",pfjetAK4jesdn_PileUpPtEC1,"pfjetAK4jesdn_PileUpPtEC1[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_PileUpPtEC2",pfjetAK4jesdn_PileUpPtEC2,"pfjetAK4jesdn_PileUpPtEC2[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_PileUpPtRef",pfjetAK4jesdn_PileUpPtRef,"pfjetAK4jesdn_PileUpPtRef[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativeFSR",pfjetAK4jesdn_RelativeFSR,"pfjetAK4jesdn_RelativeFSR[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativeJEREC1",pfjetAK4jesdn_RelativeJEREC1,"pfjetAK4jesdn_RelativeJEREC1[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativeJEREC2",pfjetAK4jesdn_RelativeJEREC2,"pfjetAK4jesdn_RelativeJEREC2[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativePtBB",pfjetAK4jesdn_RelativePtBB,"pfjetAK4jesdn_RelativePtBB[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativePtEC1",pfjetAK4jesdn_RelativePtEC1,"pfjetAK4jesdn_RelativePtEC1[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativePtEC2",pfjetAK4jesdn_RelativePtEC2,"pfjetAK4jesdn_RelativePtEC2[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativeBal",pfjetAK4jesdn_RelativeBal,"pfjetAK4jesdn_RelativeBal[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativeSample",pfjetAK4jesdn_RelativeSample,"pfjetAK4jesdn_RelativeSample[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativeStatEC",pfjetAK4jesdn_RelativeStatEC,"pfjetAK4jesdn_RelativeStatEC[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_RelativeStatFSR",pfjetAK4jesdn_RelativeStatFSR,"pfjetAK4jesdn_RelativeStatFSR[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_SinglePionECAL",pfjetAK4jesdn_SinglePionECAL,"pfjetAK4jesdn_SinglePionECAL[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_SinglePionHCAL",pfjetAK4jesdn_SinglePionHCAL,"pfjetAK4jesdn_SinglePionHCAL[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_TimePtEta",pfjetAK4jesdn_TimePtEta,"pfjetAK4jesdn_TimePtEta[npfjetAK4]/F");
+  T1->Branch("pfjetAK4jesdn_Total",pfjetAK4jesdn_Total,"pfjetAK4jesdn_Total[npfjetAK4]/F");
+  
   
   T1->Branch("pfjetAK4hadronflav",pfjetAK4hadronflav,"pfjetAK4hadronflav[npfjetAK4]/I");
   T1->Branch("pfjetAK4partonflav",pfjetAK4partonflav,"pfjetAK4partonflav[npfjetAK4]/I");
@@ -1137,8 +1276,8 @@ Leptop::Leptop(const edm::ParameterSet& pset):
     T1->Branch("Generator_x2",&Generator_x2,"Generator_x2/F");
     T1->Branch("Generator_xpdf1",&Generator_xpdf1,"Generator_xpdf1/F");
     T1->Branch("Generator_xpdf2",&Generator_xpdf2,"Generator_xpdf2/F");
-    T1->Branch("Generator_id1",&Generator_id1,"Generator_id1/I");
-    T1->Branch("Generator_id2",&Generator_id2,"Generator_id2/I");
+    T1->Branch("Generator_id1",&Generator_id1,"Generator_id1/F");
+    T1->Branch("Generator_id2",&Generator_id2,"Generator_id2/F");
     T1->Branch("Generator_scalePDF",&Generator_scalePDF,"Generator_scalePDF/F");
  
     // GEN MET info //
@@ -1821,6 +1960,9 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       	
       }//isMC
       
+
+      // JES uncertainty //
+      
       for(int isrc =0 ; isrc<njecmcmx; isrc++){
 	
         double sup = 1.0 ;
@@ -1832,10 +1974,31 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 		  jecUnc->setJetPt(tmprecpt);
 		  
 		  sup += jecUnc->getUncertainty(true);         
-		  if(isrc==1){ pfjetAK8jesup_pu[npfjetAK8] = sup; }
-		  if(isrc==2){ pfjetAK8jesup_rel[npfjetAK8] = sup; }
-		  if(isrc==4){ pfjetAK8jesup_scale[npfjetAK8] = sup; }
-		  if(isrc==7){ pfjetAK8jesup_total[npfjetAK8] = sup; }
+		  if(isrc==1){ pfjetAK8jesup_AbsoluteStat[npfjetAK8] = sup; }
+		  if(isrc==2){ pfjetAK8jesup_AbsoluteScale[npfjetAK8] = sup; }
+		  if(isrc==3){ pfjetAK8jesup_AbsoluteMPFBias[npfjetAK8] = sup; }
+		  if(isrc==4){ pfjetAK8jesup_FlavorQCD[npfjetAK8] = sup; }
+		  if(isrc==5){ pfjetAK8jesup_Fragmentation[npfjetAK8] = sup; }
+		  if(isrc==6){ pfjetAK8jesup_PileUpDataMC[npfjetAK8] = sup; }
+		  if(isrc==7){ pfjetAK8jesup_PileUpPtBB[npfjetAK8] = sup; }
+		  if(isrc==8){ pfjetAK8jesup_PileUpPtEC1[npfjetAK8] = sup; }
+		  if(isrc==9){ pfjetAK8jesup_PileUpPtEC2[npfjetAK8] = sup; }
+		  if(isrc==10){ pfjetAK8jesup_PileUpPtRef[npfjetAK8] = sup; }
+		  if(isrc==11){ pfjetAK8jesup_RelativeFSR[npfjetAK8] = sup; }
+		  if(isrc==12){ pfjetAK8jesup_RelativeJEREC1[npfjetAK8] = sup; }
+		  if(isrc==13){ pfjetAK8jesup_RelativeJEREC2[npfjetAK8] = sup; }
+		  if(isrc==14){ pfjetAK8jesup_RelativePtBB[npfjetAK8] = sup; }
+		  if(isrc==15){ pfjetAK8jesup_RelativePtEC1[npfjetAK8] = sup; }
+		  if(isrc==16){ pfjetAK8jesup_RelativePtEC2[npfjetAK8] = sup; }
+		  if(isrc==17){ pfjetAK8jesup_RelativeBal[npfjetAK8] = sup; }
+		  if(isrc==18){ pfjetAK8jesup_RelativeSample[npfjetAK8] = sup; }
+		  if(isrc==19){ pfjetAK8jesup_RelativeStatEC[npfjetAK8] = sup; }
+		  if(isrc==20){ pfjetAK8jesup_RelativeStatFSR[npfjetAK8] = sup; }
+		  if(isrc==21){ pfjetAK8jesup_SinglePionECAL[npfjetAK8] = sup; }
+		  if(isrc==22){ pfjetAK8jesup_SinglePionHCAL[npfjetAK8] = sup; }
+		  if(isrc==23){ pfjetAK8jesup_TimePtEta[npfjetAK8] = sup; }
+		  if(isrc==24){ pfjetAK8jesup_Total[npfjetAK8] = sup; }
+		
 		}
 		else if(isrc>nsrc){
 		  
@@ -1844,14 +2007,35 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 		  jecUnc->setJetPt(tmprecpt);
 		  
 		  sup -= jecUnc->getUncertainty(false);
-		  if(isrc==8){ pfjetAK8jesdn_pu[npfjetAK8] = sup; }
-		  if(isrc==9){ pfjetAK8jesdn_rel[npfjetAK8] = sup; }
-		  if(isrc==11){ pfjetAK8jesdn_scale[npfjetAK8] = sup; }
-		  if(isrc==14){ pfjetAK8jesdn_total[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+1)){ pfjetAK8jesdn_AbsoluteStat[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+2)){ pfjetAK8jesdn_AbsoluteScale[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+3)){ pfjetAK8jesdn_AbsoluteMPFBias[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+4)){ pfjetAK8jesdn_FlavorQCD[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+5)){ pfjetAK8jesdn_Fragmentation[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+6)){ pfjetAK8jesdn_PileUpDataMC[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+7)){ pfjetAK8jesdn_PileUpPtBB[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+8)){ pfjetAK8jesdn_PileUpPtEC1[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+9)){ pfjetAK8jesdn_PileUpPtEC2[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+10)){ pfjetAK8jesdn_PileUpPtRef[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+11)){ pfjetAK8jesdn_RelativeFSR[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+12)){ pfjetAK8jesdn_RelativeJEREC1[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+13)){ pfjetAK8jesdn_RelativeJEREC2[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+14)){ pfjetAK8jesdn_RelativePtBB[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+15)){ pfjetAK8jesdn_RelativePtEC1[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+16)){ pfjetAK8jesdn_RelativePtEC2[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+17)){ pfjetAK8jesdn_RelativeBal[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+18)){ pfjetAK8jesdn_RelativeSample[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+19)){ pfjetAK8jesdn_RelativeStatEC[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+20)){ pfjetAK8jesdn_RelativeStatFSR[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+21)){ pfjetAK8jesdn_SinglePionECAL[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+22)){ pfjetAK8jesdn_SinglePionHCAL[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+23)){ pfjetAK8jesdn_TimePtEta[npfjetAK8] = sup; }
+		  if(isrc==(nsrc+24)){ pfjetAK8jesdn_Total[npfjetAK8] = sup; }
 		}
 		
       }
       
+      // Jet id //      
       pfjetAK8CHF[npfjetAK8] = ak8jet.chargedHadronEnergyFraction();
       pfjetAK8NHF[npfjetAK8] = ak8jet.neutralHadronEnergyFraction();
       pfjetAK8CEMF[npfjetAK8] = ak8jet.chargedEmEnergyFraction();
@@ -2314,10 +2498,10 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       iEvent.getByToken(tok_genparticles_,genparticles);
       if(genparticles.isValid()){
 	for(unsigned ig=0; ig<(genparticles->size()); ig++){
-	  if(!(((*genparticles)[ig].status()==1)||((*genparticles)[ig].status()==22)||((*genparticles)[ig].status()==23))) continue;
-	  if(!((*genparticles)[ig].isHardProcess())) continue;
+	  if(!(((*genparticles)[ig].status()==1)||((*genparticles)[ig].status()==22)||((*genparticles)[ig].status()==23) || ((*genparticles)[ig].mother() &&  abs((*genparticles)[ig].mother()->pdgId()) == 15 ))) continue;
+	  if(!((*genparticles)[ig].isHardProcess() || ((*genparticles)[ig].mother() &&  abs((*genparticles)[ig].mother()->pdgId()) == 15 )) continue;
 	  
-	  if(!((abs((*genparticles)[ig].pdgId())>=1&&abs((*genparticles)[ig].pdgId())<=6)||(abs((*genparticles)[ig].pdgId())>=11&&abs((*genparticles)[ig].pdgId())<=16)||(abs((*genparticles)[ig].pdgId())==24))) continue;
+	  if(!((abs((*genparticles)[ig].pdgId())>=1&&abs((*genparticles)[ig].pdgId())<=6)||(abs((*genparticles)[ig].pdgId())>=11&&abs((*genparticles)[ig].pdgId())<=16)||(abs((*genparticles)[ig].pdgId())==24) || ((*genparticles)[ig].mother() &&  abs((*genparticles)[ig].mother()->pdgId()) == 15 ))) continue;
 	  const Candidate * mom = (*genparticles)[ig].mother();
 	  
 	  genpartstatus[ngenparticles] = (*genparticles)[ig].status();
@@ -2805,39 +2989,83 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       
       // JES Uncertainty //
       
-      for(int isrc =0 ; isrc<njecmcmx; isrc++){
-	double sup = 1.0 ;
+     for(int isrc =0 ; isrc<njecmcmx; isrc++){
 	
-	if((isrc>0)&&(isrc<=nsrc)){
-	  
-	  JetCorrectionUncertainty *jecUnc = vsrc[isrc-1];
-	  jecUnc->setJetEta(ak4jet.eta());
-	  jecUnc->setJetPt(tmprecpt);
-	  
-	  sup += jecUnc->getUncertainty(true);         
-	  if(isrc==1){ pfjetAK4jesup_pu[npfjetAK4] = sup; }
-	  if(isrc==2){  pfjetAK4jesup_rel[npfjetAK4] = sup; }
-	  if(isrc==4){ pfjetAK4jesup_scale[npfjetAK4] = sup; }
-	  if(isrc==7){ pfjetAK4jesup_total[npfjetAK4] = sup; }
-	}
+		double sup = 1.0 ;
 	
-	else if(isrc>nsrc){
+		if((isrc>0)&&(isrc<=nsrc)){
 	  
-	  JetCorrectionUncertainty *jecUnc = vsrc[isrc-1-nsrc];
-	  jecUnc->setJetEta(ak4jet.eta());
-	  jecUnc->setJetPt(tmprecpt);
+			JetCorrectionUncertainty *jecUnc = vsrc[isrc-1];
+			jecUnc->setJetEta(ak4jet.eta());
+			jecUnc->setJetPt(tmprecpt);
 	  
-	  sup -= jecUnc->getUncertainty(false);
-	  if(isrc==8){ pfjetAK4jesdn_pu[npfjetAK4] = sup; }
-	  if(isrc==9){ pfjetAK4jesdn_rel[npfjetAK4] = sup; }
-	  if(isrc==11){ pfjetAK4jesdn_scale[npfjetAK4] = sup; }
-	  if(isrc==14){ pfjetAK4jesdn_total[npfjetAK4] = sup; }
-      }
+			sup += jecUnc->getUncertainty(true);         
+			if(isrc==1){ pfjetAK4jesup_AbsoluteStat[npfjetAK4] = sup; }
+			if(isrc==2){ pfjetAK4jesup_AbsoluteScale[npfjetAK4] = sup; }
+			if(isrc==3){ pfjetAK4jesup_AbsoluteMPFBias[npfjetAK4] = sup; }
+			if(isrc==4){ pfjetAK4jesup_FlavorQCD[npfjetAK4] = sup; }
+			if(isrc==5){ pfjetAK4jesup_Fragmentation[npfjetAK4] = sup; }
+			if(isrc==6){ pfjetAK4jesup_PileUpDataMC[npfjetAK4] = sup; }
+			if(isrc==7){ pfjetAK4jesup_PileUpPtBB[npfjetAK4] = sup; }
+			if(isrc==8){ pfjetAK4jesup_PileUpPtEC1[npfjetAK4] = sup; }
+			if(isrc==9){ pfjetAK4jesup_PileUpPtEC2[npfjetAK4] = sup; }
+			if(isrc==10){ pfjetAK4jesup_PileUpPtRef[npfjetAK4] = sup; }
+			if(isrc==11){ pfjetAK4jesup_RelativeFSR[npfjetAK4] = sup; }
+			if(isrc==12){ pfjetAK4jesup_RelativeJEREC1[npfjetAK4] = sup; }
+			if(isrc==13){ pfjetAK4jesup_RelativeJEREC2[npfjetAK4] = sup; }
+			if(isrc==14){ pfjetAK4jesup_RelativePtBB[npfjetAK4] = sup; }
+			if(isrc==15){ pfjetAK4jesup_RelativePtEC1[npfjetAK4] = sup; }
+			if(isrc==16){ pfjetAK4jesup_RelativePtEC2[npfjetAK4] = sup; }
+			if(isrc==17){ pfjetAK4jesup_RelativeBal[npfjetAK4] = sup; }
+			if(isrc==18){ pfjetAK4jesup_RelativeSample[npfjetAK4] = sup; }
+			if(isrc==19){ pfjetAK4jesup_RelativeStatEC[npfjetAK4] = sup; }
+			if(isrc==20){ pfjetAK4jesup_RelativeStatFSR[npfjetAK4] = sup; }
+			if(isrc==21){ pfjetAK4jesup_SinglePionECAL[npfjetAK4] = sup; }
+			if(isrc==22){ pfjetAK4jesup_SinglePionHCAL[npfjetAK4] = sup; }
+			if(isrc==23){ pfjetAK4jesup_TimePtEta[npfjetAK4] = sup; }
+			if(isrc==24){ pfjetAK4jesup_Total[npfjetAK4] = sup; }
+		}
 	
-      }
+		else if(isrc>nsrc){
+	  
+			JetCorrectionUncertainty *jecUnc = vsrc[isrc-1-nsrc];
+		    jecUnc->setJetEta(ak4jet.eta());
+		    jecUnc->setJetPt(tmprecpt);
+	  
+			sup -= jecUnc->getUncertainty(false);
+			if(isrc==(nsrc+1)){ pfjetAK4jesdn_AbsoluteStat[npfjetAK4] = sup; }
+			if(isrc==(nsrc+2)){ pfjetAK4jesdn_AbsoluteScale[npfjetAK4] = sup; }
+			if(isrc==(nsrc+3)){ pfjetAK4jesdn_AbsoluteMPFBias[npfjetAK4] = sup; }
+			if(isrc==(nsrc+4)){ pfjetAK4jesdn_FlavorQCD[npfjetAK4] = sup; }
+			if(isrc==(nsrc+5)){ pfjetAK4jesdn_Fragmentation[npfjetAK4] = sup; }
+			if(isrc==(nsrc+6)){ pfjetAK4jesdn_PileUpDataMC[npfjetAK4] = sup; }
+			if(isrc==(nsrc+7)){ pfjetAK4jesdn_PileUpPtBB[npfjetAK4] = sup; }
+			if(isrc==(nsrc+8)){ pfjetAK4jesdn_PileUpPtEC1[npfjetAK4] = sup; }
+			if(isrc==(nsrc+9)){ pfjetAK4jesdn_PileUpPtEC2[npfjetAK4] = sup; }
+			if(isrc==(nsrc+10)){ pfjetAK4jesdn_PileUpPtRef[npfjetAK4] = sup; }
+			if(isrc==(nsrc+11)){ pfjetAK4jesdn_RelativeFSR[npfjetAK4] = sup; }
+			if(isrc==(nsrc+12)){ pfjetAK4jesdn_RelativeJEREC1[npfjetAK4] = sup; }
+			if(isrc==(nsrc+13)){ pfjetAK4jesdn_RelativeJEREC2[npfjetAK4] = sup; }
+			if(isrc==(nsrc+14)){ pfjetAK4jesdn_RelativePtBB[npfjetAK4] = sup; }
+			if(isrc==(nsrc+15)){ pfjetAK4jesdn_RelativePtEC1[npfjetAK4] = sup; }
+			if(isrc==(nsrc+16)){ pfjetAK4jesdn_RelativePtEC2[npfjetAK4] = sup; }
+			if(isrc==(nsrc+17)){ pfjetAK4jesdn_RelativeBal[npfjetAK4] = sup; }
+			if(isrc==(nsrc+18)){ pfjetAK4jesdn_RelativeSample[npfjetAK4] = sup; }
+			if(isrc==(nsrc+19)){ pfjetAK4jesdn_RelativeStatEC[npfjetAK4] = sup; }
+			if(isrc==(nsrc+20)){ pfjetAK4jesdn_RelativeStatFSR[npfjetAK4] = sup; }
+			if(isrc==(nsrc+21)){ pfjetAK4jesdn_SinglePionECAL[npfjetAK4] = sup; }
+			if(isrc==(nsrc+22)){ pfjetAK4jesdn_SinglePionHCAL[npfjetAK4] = sup; }
+			if(isrc==(nsrc+23)){ pfjetAK4jesdn_TimePtEta[npfjetAK4] = sup; }
+			if(isrc==(nsrc+24)){ pfjetAK4jesdn_Total[npfjetAK4] = sup; }
+			
+		}
+	
+    }
       
-    // JES Uncertainty Ends //
-      
+    // JES uncertainty Ends //
+    
+    // Jet id //
+     
       pfjetAK4CHF[npfjetAK4] = ak4jet.chargedHadronEnergyFraction();
       pfjetAK4NHF[npfjetAK4] = ak4jet.neutralHadronEnergyFraction();
       pfjetAK4CEMF[npfjetAK4] = ak4jet.chargedEmEnergyFraction();
@@ -3279,13 +3507,13 @@ Leptop::beginJob()
   jecL2L3ResidualAK8 = new FactorizedJetCorrector(vecL2L3ResidualAK8);
   
   for (int isrc = 0; isrc < nsrc; isrc++) {
-    const char *name = srcnames[isrc];
-    JetCorrectorParameters *p = new JetCorrectorParameters(mJECUncFileAK4.c_str(), name) ;
-    JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
-    vsrc.push_back(unc);
-    JetCorrectorParameters *p1 = new JetCorrectorParameters(mJECUncFileAK8.c_str(), name) ;
-    JetCorrectionUncertainty *unc1 = new JetCorrectionUncertainty(*p1);
-    vsrcAK8.push_back(unc1);
+    const char *name = jecsrcnames[isrc];
+    JetCorrectorParameters *pAK4 = new JetCorrectorParameters(mJECUncFileAK4.c_str(), name) ;
+    JetCorrectionUncertainty *uncAK4 = new JetCorrectionUncertainty(*pAK4);
+    vsrc.push_back(uncAK4);
+    JetCorrectorParameters *pAK8 = new JetCorrectorParameters(mJECUncFileAK8.c_str(), name) ;
+    JetCorrectionUncertainty *uncAK8 = new JetCorrectionUncertainty(*pAK8);
+    vsrcAK8.push_back(uncAK8);
   }
   
   if(read_btagSF){
