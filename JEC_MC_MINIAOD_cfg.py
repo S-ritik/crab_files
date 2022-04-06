@@ -116,6 +116,10 @@ for iModule in pho_id_modules:
 	setupAllVIDIdsInModule(process, iModule, setupVIDPhotonSelection)
 
 
+# E-Gamma scale and smearing corrections 
+from L5_Cor.Data.EgammaPostRecoTools import setupEgammaPostRecoSeq
+setupEgammaPostRecoSeq(process,era='2018-Prompt')
+
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
 deep_discriminators = ["pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:TvsQCD",
                        "pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD",
@@ -301,6 +305,7 @@ process.puppi.useExistingWeights = True
 process.p = cms.Path(process.egmPhotonIDSequence* 
  		     process.HBHENoiseFilterResultProducer*process.HBHENoiseFilterResultProducerNoMinZ*
 		     process.allMetFilterPaths*
+                     process.egammaPostRecoSeq*
                      process.prefiringweight*
 #		     process.egmGsfElectronIDSequence*
 		     process.jetSeq *
