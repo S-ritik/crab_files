@@ -923,7 +923,6 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   
   tok_mets_= consumes<pat::METCollection> ( pset.getParameter<edm::InputTag>("PFMet"));
   tok_mets_PUPPI_ = consumes<pat::METCollection> ( pset.getParameter<edm::InputTag>("PuppiMet"));
-  tok_genmets_= consumes<reco::GenMETCollection> ( pset.getParameter<edm::InputTag>("GENMet"));
   
   //pfToken_(consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("pfCands")))
   tok_pfcands_ = consumes<pat::PackedCandidateCollection>( pset.getParameter<edm::InputTag>("pfCands"));
@@ -935,6 +934,7 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   tok_pfjetAK8s_= consumes<edm::View<pat::Jet>>( pset.getParameter<edm::InputTag>("PFJetsAK8"));
   tok_pfjetAK4s_= consumes<edm::View<pat::Jet>>( pset.getParameter<edm::InputTag>("PFJetsAK4"));
   if(isMC){
+    tok_genmets_= consumes<reco::GenMETCollection> ( pset.getParameter<edm::InputTag>("GENMet"));
     tok_genjetAK8s_= consumes<reco::GenJetCollection>( pset.getParameter<edm::InputTag>("GENJetAK8"));
     tok_genjetAK4s_= consumes<reco::GenJetCollection>( pset.getParameter<edm::InputTag>("GENJetAK4"));
     tok_genparticles_ = consumes<std::vector<reco::GenParticle>>( pset.getParameter<edm::InputTag>("GenParticles"));
@@ -1638,24 +1638,29 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       }
       // LHE-level weights //
       
-	  LHE_weight = lheeventinfo->originalXWGTUP();
-	  
-	  for ( unsigned int index = 0; index < lheeventinfo->weights().size(); ++index ) {	
-	    //cout<<"Index "<<index+1<<" Id "<<lheeventinfo->weights()[index].id<<" weight "<<lheeventinfo->weights()[index].wgt/lheeventinfo->originalXWGTUP()<<endl;//" muR "<<lheeventinfo->weights()[index].MUR<<" muF "<<lheeventinfo->weights()[index].MUF<<" DYN Scale "<<lheeventinfo->weights()[index].DYN_SCALE<<endl;
-	    if(index<nlhescalemax && nLHEScaleWeights<nlhescalemax){
-	      LHEScaleWeights[nLHEScaleWeights] = lheeventinfo->weights()[index].wgt/lheeventinfo->originalXWGTUP();
-	      nLHEScaleWeights++;
-	    }
-	    if(index>=nlhescalemax && index<(nlhescalemax+nPDFsets)  && nLHEPDFWeights<nlhepdfmax){
-	      LHEPDFWeights[nLHEPDFWeights] = lheeventinfo->weights()[index].wgt/lheeventinfo->originalXWGTUP();
-	      nLHEPDFWeights++;
-	    }
-	    if(index>=(nlhescalemax+nPDFsets) && index<(nlhescalemax+nPDFsets+nalpsmax) && nLHEAlpsWeights<nalpsmax){
-	      LHEAlpsWeights[nLHEAlpsWeights] = lheeventinfo->weights()[index].wgt/lheeventinfo->originalXWGTUP();
-	      nLHEAlpsWeights++;
-	    }
-	  }
-	  
+      LHE_weight =  lheeventinfo->originalXWGTUP();
+      if (LHE_weight >0) {
+	LHE_weight = max(1.e-12, LHE_weight);
+      } else {
+	LHE_weight = min(-1.e-12, LHE_weight);
+      } 
+      
+      for ( unsigned int index = 0; index < lheeventinfo->weights().size(); ++index ) {	
+	//cout<<"Index "<<index+1<<" Id "<<lheeventinfo->weights()[index].id<<" weight "<<lheeventinfo->weights()[index].wgt/LHE_weight<<endl;//" muR "<<lheeventinfo->weights()[index].MUR<<" muF "<<lheeventinfo->weights()[index].MUF<<" DYN Scale "<<lheeventinfo->weights()[index].DYN_SCALE<<endl;
+	if(index<nlhescalemax && nLHEScaleWeights<nlhescalemax){
+	  LHEScaleWeights[nLHEScaleWeights] = lheeventinfo->weights()[index].wgt/LHE_weight;
+	  nLHEScaleWeights++;
+	}
+	if(index>=nlhescalemax && index<(nlhescalemax+nPDFsets)  && nLHEPDFWeights<nlhepdfmax){
+	  LHEPDFWeights[nLHEPDFWeights] = lheeventinfo->weights()[index].wgt/LHE_weight;
+	  nLHEPDFWeights++;
+	}
+	if(index>=(nlhescalemax+nPDFsets) && index<(nlhescalemax+nPDFsets+nalpsmax) && nLHEAlpsWeights<nalpsmax){
+	  LHEAlpsWeights[nLHEAlpsWeights] = lheeventinfo->weights()[index].wgt/LHE_weight;
+	  nLHEAlpsWeights++;
+	}
+      }
+      
     }//lheeventinfo
     
     // pileup information
@@ -2036,6 +2041,8 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       }//isMC
       
       // JES uncertainty //
+
+      pfjetAK8jesup_AbsoluteStat[npfjetAK8] = pfjetAK8jesup_AbsoluteScale[npfjetAK8] = pfjetAK8jesup_AbsoluteMPFBias[npfjetAK8] = pfjetAK8jesup_FlavorQCD[npfjetAK8] = pfjetAK8jesup_Fragmentation[npfjetAK8] = pfjetAK8jesup_PileUpDataMC[npfjetAK8] = pfjetAK8jesup_PileUpPtBB[npfjetAK8] = pfjetAK8jesup_PileUpPtEC1[npfjetAK8] = pfjetAK8jesup_PileUpPtEC2[npfjetAK8] = pfjetAK8jesup_PileUpPtHF[npfjetAK8] = pfjetAK8jesup_PileUpPtRef[npfjetAK8] = pfjetAK8jesup_RelativeFSR[npfjetAK8] = pfjetAK8jesup_RelativeJEREC1[npfjetAK8] = pfjetAK8jesup_RelativeJEREC2[npfjetAK8] = pfjetAK8jesup_RelativeJERHF[npfjetAK8] = pfjetAK8jesup_RelativePtBB[npfjetAK8] = pfjetAK8jesup_RelativePtEC1[npfjetAK8] = pfjetAK8jesup_RelativePtEC2[npfjetAK8] = pfjetAK8jesup_RelativePtHF[npfjetAK8] = pfjetAK8jesup_RelativeBal[npfjetAK8] = pfjetAK8jesup_RelativeSample[npfjetAK8] = pfjetAK8jesup_RelativeStatEC[npfjetAK8] = pfjetAK8jesup_RelativeStatHF[npfjetAK8] = pfjetAK8jesup_RelativeStatFSR[npfjetAK8] = pfjetAK8jesup_SinglePionECAL[npfjetAK8] = pfjetAK8jesup_SinglePionHCAL[npfjetAK8] = pfjetAK8jesup_TimePtEta[npfjetAK8] = pfjetAK8jesup_Total[npfjetAK8] = 1;
       
       for(int isrc =0 ; isrc<njecmcmx; isrc++){
 	
@@ -2047,36 +2054,38 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 		  jecUnc->setJetEta(ak8jet.eta());
 		  jecUnc->setJetPt(tmprecpt);
 		  
-		  sup += jecUnc->getUncertainty(true);         
-		  if(isrc==1){ pfjetAK8jesup_AbsoluteStat[npfjetAK8] = sup; }
-		  if(isrc==2){ pfjetAK8jesup_AbsoluteScale[npfjetAK8] = sup; }
-		  if(isrc==3){ pfjetAK8jesup_AbsoluteMPFBias[npfjetAK8] = sup; }
-		  if(isrc==4){ pfjetAK8jesup_FlavorQCD[npfjetAK8] = sup; }
-		  if(isrc==5){ pfjetAK8jesup_Fragmentation[npfjetAK8] = sup; }
-		  if(isrc==6){ pfjetAK8jesup_PileUpDataMC[npfjetAK8] = sup; }
-		  if(isrc==7){ pfjetAK8jesup_PileUpPtBB[npfjetAK8] = sup; }
-		  if(isrc==8){ pfjetAK8jesup_PileUpPtEC1[npfjetAK8] = sup; }
-		  if(isrc==9){ pfjetAK8jesup_PileUpPtEC2[npfjetAK8] = sup; }
-		  if(isrc==10){ pfjetAK8jesup_PileUpPtHF[npfjetAK8] = sup; }
-		  if(isrc==11){ pfjetAK8jesup_PileUpPtRef[npfjetAK8] = sup; }
-		  if(isrc==12){ pfjetAK8jesup_RelativeFSR[npfjetAK8] = sup; }
-		  if(isrc==13){ pfjetAK8jesup_RelativeJEREC1[npfjetAK8] = sup; }
-		  if(isrc==14){ pfjetAK8jesup_RelativeJEREC2[npfjetAK8] = sup; }
-		  if(isrc==15){ pfjetAK8jesup_RelativeJERHF[npfjetAK8] = sup; }
-		  if(isrc==16){ pfjetAK8jesup_RelativePtBB[npfjetAK8] = sup; }
-		  if(isrc==17){ pfjetAK8jesup_RelativePtEC1[npfjetAK8] = sup; }
-		  if(isrc==18){ pfjetAK8jesup_RelativePtEC2[npfjetAK8] = sup; }
-		  if(isrc==19){ pfjetAK8jesup_RelativePtHF[npfjetAK8] = sup; }
-		  if(isrc==20){ pfjetAK8jesup_RelativeBal[npfjetAK8] = sup; }
-		  if(isrc==21){ pfjetAK8jesup_RelativeSample[npfjetAK8] = sup; }
-		  if(isrc==22){ pfjetAK8jesup_RelativeStatEC[npfjetAK8] = sup; }
-		  if(isrc==23){ pfjetAK8jesup_RelativeStatHF[npfjetAK8] = sup; }
-		  if(isrc==24){ pfjetAK8jesup_RelativeStatFSR[npfjetAK8] = sup; }
-		  if(isrc==25){ pfjetAK8jesup_SinglePionECAL[npfjetAK8] = sup; }
-		  if(isrc==26){ pfjetAK8jesup_SinglePionHCAL[npfjetAK8] = sup; }
-		  if(isrc==27){ pfjetAK8jesup_TimePtEta[npfjetAK8] = sup; }
-		  if(isrc==28){ pfjetAK8jesup_Total[npfjetAK8] = sup; }
-		
+		  sup += jecUnc->getUncertainty(true);
+		  switch(isrc){
+		  case 1:  pfjetAK8jesup_AbsoluteStat[npfjetAK8] = sup; break;
+		  case 2:  pfjetAK8jesup_AbsoluteScale[npfjetAK8] = sup; break;
+		  case 3:  pfjetAK8jesup_AbsoluteMPFBias[npfjetAK8] = sup; break;
+		  case 4:  pfjetAK8jesup_FlavorQCD[npfjetAK8] = sup; break;
+		  case 5:  pfjetAK8jesup_Fragmentation[npfjetAK8] = sup; break;
+		  case 6:  pfjetAK8jesup_PileUpDataMC[npfjetAK8] = sup; break;
+		  case 7:  pfjetAK8jesup_PileUpPtBB[npfjetAK8] = sup; break;
+		  case 8:  pfjetAK8jesup_PileUpPtEC1[npfjetAK8] = sup; break;
+		  case 9:  pfjetAK8jesup_PileUpPtEC2[npfjetAK8] = sup; break;
+		  case 10:  pfjetAK8jesup_PileUpPtHF[npfjetAK8] = sup; break;
+		  case 11:  pfjetAK8jesup_PileUpPtRef[npfjetAK8] = sup; break;
+		  case 12:  pfjetAK8jesup_RelativeFSR[npfjetAK8] = sup; break;
+		  case 13:  pfjetAK8jesup_RelativeJEREC1[npfjetAK8] = sup; break;
+		  case 14:  pfjetAK8jesup_RelativeJEREC2[npfjetAK8] = sup; break;
+		  case 15:  pfjetAK8jesup_RelativeJERHF[npfjetAK8] = sup; break;
+		  case 16:  pfjetAK8jesup_RelativePtBB[npfjetAK8] = sup; break;
+		  case 17:  pfjetAK8jesup_RelativePtEC1[npfjetAK8] = sup; break;
+		  case 18:  pfjetAK8jesup_RelativePtEC2[npfjetAK8] = sup; break;
+		  case 19:  pfjetAK8jesup_RelativePtHF[npfjetAK8] = sup; break;
+		  case 20:  pfjetAK8jesup_RelativeBal[npfjetAK8] = sup; break;
+		  case 21:  pfjetAK8jesup_RelativeSample[npfjetAK8] = sup; break;
+		  case 22:  pfjetAK8jesup_RelativeStatEC[npfjetAK8] = sup; break;
+		  case 23:  pfjetAK8jesup_RelativeStatHF[npfjetAK8] = sup; break;
+		  case 24:  pfjetAK8jesup_RelativeStatFSR[npfjetAK8] = sup; break;
+		  case 25:  pfjetAK8jesup_SinglePionECAL[npfjetAK8] = sup; break;
+		  case 26:  pfjetAK8jesup_SinglePionHCAL[npfjetAK8] = sup; break;
+		  case 27:  pfjetAK8jesup_TimePtEta[npfjetAK8] = sup; break;
+		  case 28:  pfjetAK8jesup_Total[npfjetAK8] = sup; break;
+		  default: continue;
+		  }
 		}
 		else if(isrc>nsrc){
 		  
@@ -2085,34 +2094,38 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 		  jecUnc->setJetPt(tmprecpt);
 		  
 		  sup -= jecUnc->getUncertainty(false);
-		  if(isrc==(nsrc+1)){ pfjetAK8jesdn_AbsoluteStat[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+2)){ pfjetAK8jesdn_AbsoluteScale[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+3)){ pfjetAK8jesdn_AbsoluteMPFBias[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+4)){ pfjetAK8jesdn_FlavorQCD[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+5)){ pfjetAK8jesdn_Fragmentation[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+6)){ pfjetAK8jesdn_PileUpDataMC[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+7)){ pfjetAK8jesdn_PileUpPtBB[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+8)){ pfjetAK8jesdn_PileUpPtEC1[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+9)){ pfjetAK8jesdn_PileUpPtEC2[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+10)){ pfjetAK8jesdn_PileUpPtHF[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+11)){ pfjetAK8jesdn_PileUpPtRef[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+12)){ pfjetAK8jesdn_RelativeFSR[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+13)){ pfjetAK8jesdn_RelativeJEREC1[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+14)){ pfjetAK8jesdn_RelativeJEREC2[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+15)){ pfjetAK8jesdn_RelativeJERHF[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+16)){ pfjetAK8jesdn_RelativePtBB[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+17)){ pfjetAK8jesdn_RelativePtEC1[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+18)){ pfjetAK8jesdn_RelativePtEC2[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+19)){ pfjetAK8jesdn_RelativePtHF[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+20)){ pfjetAK8jesdn_RelativeBal[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+21)){ pfjetAK8jesdn_RelativeSample[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+22)){ pfjetAK8jesdn_RelativeStatEC[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+23)){ pfjetAK8jesdn_RelativeStatHF[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+24)){ pfjetAK8jesdn_RelativeStatFSR[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+25)){ pfjetAK8jesdn_SinglePionECAL[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+26)){ pfjetAK8jesdn_SinglePionHCAL[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+27)){ pfjetAK8jesdn_TimePtEta[npfjetAK8] = sup; }
-		  if(isrc==(nsrc+28)){ pfjetAK8jesdn_Total[npfjetAK8] = sup; }
+		  
+		  switch(isrc){
+		  case (nsrc+1):  pfjetAK8jesdn_AbsoluteStat[npfjetAK8] = sup; break;
+		  case (nsrc+2):  pfjetAK8jesdn_AbsoluteScale[npfjetAK8] = sup; break;
+		  case (nsrc+3):  pfjetAK8jesdn_AbsoluteMPFBias[npfjetAK8] = sup; break;
+		  case (nsrc+4):  pfjetAK8jesdn_FlavorQCD[npfjetAK8] = sup; break;
+		  case (nsrc+5):  pfjetAK8jesdn_Fragmentation[npfjetAK8] = sup; break;
+		  case (nsrc+6):  pfjetAK8jesdn_PileUpDataMC[npfjetAK8] = sup; break;
+		  case (nsrc+7):  pfjetAK8jesdn_PileUpPtBB[npfjetAK8] = sup; break;
+		  case (nsrc+8):  pfjetAK8jesdn_PileUpPtEC1[npfjetAK8] = sup; break;
+		  case (nsrc+9):  pfjetAK8jesdn_PileUpPtEC2[npfjetAK8] = sup; break;
+		  case (nsrc+10):  pfjetAK8jesdn_PileUpPtHF[npfjetAK8] = sup; break;
+		  case (nsrc+11):  pfjetAK8jesdn_PileUpPtRef[npfjetAK8] = sup; break;
+		  case (nsrc+12):  pfjetAK8jesdn_RelativeFSR[npfjetAK8] = sup; break;
+		  case (nsrc+13):  pfjetAK8jesdn_RelativeJEREC1[npfjetAK8] = sup; break;
+		  case (nsrc+14):  pfjetAK8jesdn_RelativeJEREC2[npfjetAK8] = sup; break;
+		  case (nsrc+15):  pfjetAK8jesdn_RelativeJERHF[npfjetAK8] = sup; break;
+		  case (nsrc+16):  pfjetAK8jesdn_RelativePtBB[npfjetAK8] = sup; break;
+		  case (nsrc+17):  pfjetAK8jesdn_RelativePtEC1[npfjetAK8] = sup; break;
+		  case (nsrc+18):  pfjetAK8jesdn_RelativePtEC2[npfjetAK8] = sup; break;
+		  case (nsrc+19):  pfjetAK8jesdn_RelativePtHF[npfjetAK8] = sup; break;
+		  case (nsrc+20):  pfjetAK8jesdn_RelativeBal[npfjetAK8] = sup; break;
+		  case (nsrc+21):  pfjetAK8jesdn_RelativeSample[npfjetAK8] = sup; break;
+		  case (nsrc+22):  pfjetAK8jesdn_RelativeStatEC[npfjetAK8] = sup; break;
+		  case (nsrc+23):  pfjetAK8jesdn_RelativeStatHF[npfjetAK8] = sup; break;
+		  case (nsrc+24):  pfjetAK8jesdn_RelativeStatFSR[npfjetAK8] = sup; break;
+		  case (nsrc+25):  pfjetAK8jesdn_SinglePionECAL[npfjetAK8] = sup; break;
+		  case (nsrc+26):  pfjetAK8jesdn_SinglePionHCAL[npfjetAK8] = sup; break;
+		  case (nsrc+27):  pfjetAK8jesdn_TimePtEta[npfjetAK8] = sup; break;
+		  case (nsrc+28):  pfjetAK8jesdn_Total[npfjetAK8] = sup; break;
+		  default: continue;
+		  }
 		}
 		
       }
@@ -2821,16 +2834,6 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 			bool mu_id = Muon_TightID(muonisGL[nmuons],muonisPF[nmuons],
 				    muonchi[nmuons],muonhit[nmuons],muonmst[nmuons],
 				    muontrkvtx[nmuons],muondz[nmuons],muonpixhit[nmuons],muontrklay[nmuons]);
-			/*	    
-			if (mu_id == true && fabs(muoneta[nmuons])<2.5) {
-				tlmu.SetPtEtaPhiE(muonpt[nmuons],muoneta[nmuons],muonphi[nmuons],muon1->energy());
-				tlvmu.push_back(tlmu);
-			}
-			*/ 
-			//Changed by Suman
-			if (fabs(muoneta[nmuons])<2.5 && mu_id && fabs(muontrkvtx[nmuons])<0.2 && fabs(muondz[nmuons])<0.5) {
-				tlvmu.push_back(*muon1);
-			}
 
 			// Application of Rochester correction //
 	  
@@ -2871,7 +2874,21 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 			Muon_correctedUp_pt[nmuons] = muonpt[nmuons]*max(rcSF+rcSF_error,float(0.));
 			Muon_correctedDown_pt[nmuons] = muonpt[nmuons]*max(rcSF-rcSF_error,float(0.));
 			
-			// End of Rochester correction // 
+			// End of Rochester correction //
+
+			/*	    
+			if (mu_id == true && fabs(muoneta[nmuons])<2.5) {
+				tlmu.SetPtEtaPhiE(muonpt[nmuons],muoneta[nmuons],muonphi[nmuons],muon1->energy());
+				tlvmu.push_back(tlmu);
+			}
+			*/ 
+			//Changed by Suman
+			if (fabs(muoneta[nmuons])<2.5 && Muon_corrected_pt[nmuons] > 30) {
+				tlvmu.push_back(*muon1);
+			}
+
+
+			
 			if (++nmuons>=njetmx) break;                                                                                                                 
 			}                                                                                                                                              
       }                                                                                                                                               
@@ -2962,6 +2979,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       elmisshits[nelecs] = (int)gsftrk1->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
 
       // scaling & smearing factors //
+      Electron_eccalTrkEnergyPostCorr[nelecs] = Electron_energyScaleValue[nelecs] = Electron_energySigmaValue[nelecs] = Electron_energyScaleUp[nelecs] = Electron_energyScaleDown[nelecs] = Electron_energySigmaUp[nelecs] = Electron_energySigmaDown[nelecs] = 1;
       
       if(store_electron_scalnsmear){
 		Electron_eccalTrkEnergyPostCorr[nelecs] = electron1.userFloat("ecalTrkEnergyPostCorr");
@@ -2983,7 +3001,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	tlvel.push_back(tlel);
 	}*/
       // Part below is added by Suman
-      if (elmvaid_noIso[nelecs] && fabs(eleta[nelecs])<2.5) {
+      if (elpt[nelecs]*Electron_energyScaleValue[nelecs] > 30 && fabs(eleta[nelecs])<2.5) {
 	tlvel.push_back(electron1);
       }
       
@@ -3170,7 +3188,9 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       }//isMC
       
       // JES Uncertainty //
-      
+
+      pfjetAK4jesup_AbsoluteStat[npfjetAK4] = pfjetAK4jesup_AbsoluteScale[npfjetAK4] = pfjetAK4jesup_AbsoluteMPFBias[npfjetAK4] = pfjetAK4jesup_FlavorQCD[npfjetAK4] = pfjetAK4jesup_Fragmentation[npfjetAK4] = pfjetAK4jesup_PileUpDataMC[npfjetAK4] = pfjetAK4jesup_PileUpPtBB[npfjetAK4] = pfjetAK4jesup_PileUpPtEC1[npfjetAK4] = pfjetAK4jesup_PileUpPtEC2[npfjetAK4] = pfjetAK4jesup_PileUpPtHF[npfjetAK4] = pfjetAK4jesup_PileUpPtRef[npfjetAK4] = pfjetAK4jesup_RelativeFSR[npfjetAK4] = pfjetAK4jesup_RelativeJEREC1[npfjetAK4] = pfjetAK4jesup_RelativeJEREC2[npfjetAK4] = pfjetAK4jesup_RelativeJERHF[npfjetAK4] = pfjetAK4jesup_RelativePtBB[npfjetAK4] = pfjetAK4jesup_RelativePtEC1[npfjetAK4] = pfjetAK4jesup_RelativePtEC2[npfjetAK4] = pfjetAK4jesup_RelativePtHF[npfjetAK4] = pfjetAK4jesup_RelativeBal[npfjetAK4] = pfjetAK4jesup_RelativeSample[npfjetAK4] = pfjetAK4jesup_RelativeStatEC[npfjetAK4] = pfjetAK4jesup_RelativeStatHF[npfjetAK4] = pfjetAK4jesup_RelativeStatFSR[npfjetAK4] = pfjetAK4jesup_SinglePionECAL[npfjetAK4] = pfjetAK4jesup_SinglePionHCAL[npfjetAK4] = pfjetAK4jesup_TimePtEta[npfjetAK4] = pfjetAK4jesup_Total[npfjetAK4] = 1;
+	
      for(int isrc =0 ; isrc<njecmcmx; isrc++){
 	
 		double sup = 1.0 ;
@@ -3181,35 +3201,38 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 			jecUnc->setJetEta(ak4jet.eta());
 			jecUnc->setJetPt(tmprecpt);
 	  
-			sup += jecUnc->getUncertainty(true);         
-			if(isrc==1){ pfjetAK4jesup_AbsoluteStat[npfjetAK4] = sup; }
-			if(isrc==2){ pfjetAK4jesup_AbsoluteScale[npfjetAK4] = sup; }
-			if(isrc==3){ pfjetAK4jesup_AbsoluteMPFBias[npfjetAK4] = sup; }
-			if(isrc==4){ pfjetAK4jesup_FlavorQCD[npfjetAK4] = sup; }
-			if(isrc==5){ pfjetAK4jesup_Fragmentation[npfjetAK4] = sup; }
-			if(isrc==6){ pfjetAK4jesup_PileUpDataMC[npfjetAK4] = sup; }
-			if(isrc==7){ pfjetAK4jesup_PileUpPtBB[npfjetAK4] = sup; }
-			if(isrc==8){ pfjetAK4jesup_PileUpPtEC1[npfjetAK4] = sup; }
-			if(isrc==9){ pfjetAK4jesup_PileUpPtEC2[npfjetAK4] = sup; }
-			if(isrc==10){ pfjetAK4jesup_PileUpPtHF[npfjetAK4] = sup; }
-			if(isrc==11){ pfjetAK4jesup_PileUpPtRef[npfjetAK4] = sup; }
-			if(isrc==12){ pfjetAK4jesup_RelativeFSR[npfjetAK4] = sup; }
-			if(isrc==13){ pfjetAK4jesup_RelativeJEREC1[npfjetAK4] = sup; }
-			if(isrc==14){ pfjetAK4jesup_RelativeJEREC2[npfjetAK4] = sup; }
-			if(isrc==15){ pfjetAK4jesup_RelativeJERHF[npfjetAK4] = sup; }
-			if(isrc==16){ pfjetAK4jesup_RelativePtBB[npfjetAK4] = sup; }
-			if(isrc==17){ pfjetAK4jesup_RelativePtEC1[npfjetAK4] = sup; }
-			if(isrc==18){ pfjetAK4jesup_RelativePtEC2[npfjetAK4] = sup; }
-			if(isrc==19){ pfjetAK4jesup_RelativePtHF[npfjetAK4] = sup; }
-			if(isrc==20){ pfjetAK4jesup_RelativeBal[npfjetAK4] = sup; }
-			if(isrc==21){ pfjetAK4jesup_RelativeSample[npfjetAK4] = sup; }
-			if(isrc==22){ pfjetAK4jesup_RelativeStatEC[npfjetAK4] = sup; }
-			if(isrc==23){ pfjetAK4jesup_RelativeStatHF[npfjetAK4] = sup; }
-			if(isrc==24){ pfjetAK4jesup_RelativeStatFSR[npfjetAK4] = sup; }
-			if(isrc==25){ pfjetAK4jesup_SinglePionECAL[npfjetAK4] = sup; }
-			if(isrc==26){ pfjetAK4jesup_SinglePionHCAL[npfjetAK4] = sup; }
-			if(isrc==27){ pfjetAK4jesup_TimePtEta[npfjetAK4] = sup; }
-			if(isrc==28){ pfjetAK4jesup_Total[npfjetAK4] = sup; }
+			sup += jecUnc->getUncertainty(true);
+			switch(isrc){
+			case 1:  pfjetAK4jesup_AbsoluteStat[npfjetAK4] = sup; break;
+			case 2:  pfjetAK4jesup_AbsoluteScale[npfjetAK4] = sup; break;
+			case 3:  pfjetAK4jesup_AbsoluteMPFBias[npfjetAK4] = sup; break;
+			case 4:  pfjetAK4jesup_FlavorQCD[npfjetAK4] = sup; break;
+			case 5:  pfjetAK4jesup_Fragmentation[npfjetAK4] = sup; break;
+			case 6:  pfjetAK4jesup_PileUpDataMC[npfjetAK4] = sup; break;
+			case 7:  pfjetAK4jesup_PileUpPtBB[npfjetAK4] = sup; break;
+			case 8:  pfjetAK4jesup_PileUpPtEC1[npfjetAK4] = sup; break;
+			case 9:  pfjetAK4jesup_PileUpPtEC2[npfjetAK4] = sup; break;
+			case 10:  pfjetAK4jesup_PileUpPtHF[npfjetAK4] = sup; break;
+			case 11:  pfjetAK4jesup_PileUpPtRef[npfjetAK4] = sup; break;
+			case 12:  pfjetAK4jesup_RelativeFSR[npfjetAK4] = sup; break;
+			case 13:  pfjetAK4jesup_RelativeJEREC1[npfjetAK4] = sup; break;
+			case 14:  pfjetAK4jesup_RelativeJEREC2[npfjetAK4] = sup; break;
+			case 15:  pfjetAK4jesup_RelativeJERHF[npfjetAK4] = sup; break;
+			case 16:  pfjetAK4jesup_RelativePtBB[npfjetAK4] = sup; break;
+			case 17:  pfjetAK4jesup_RelativePtEC1[npfjetAK4] = sup; break;
+			case 18:  pfjetAK4jesup_RelativePtEC2[npfjetAK4] = sup; break;
+			case 19:  pfjetAK4jesup_RelativePtHF[npfjetAK4] = sup; break;
+			case 20:  pfjetAK4jesup_RelativeBal[npfjetAK4] = sup; break;
+			case 21:  pfjetAK4jesup_RelativeSample[npfjetAK4] = sup; break;
+			case 22:  pfjetAK4jesup_RelativeStatEC[npfjetAK4] = sup; break;
+			case 23:  pfjetAK4jesup_RelativeStatHF[npfjetAK4] = sup; break;
+			case 24:  pfjetAK4jesup_RelativeStatFSR[npfjetAK4] = sup; break;
+			case 25:  pfjetAK4jesup_SinglePionECAL[npfjetAK4] = sup; break;
+			case 26:  pfjetAK4jesup_SinglePionHCAL[npfjetAK4] = sup; break;
+			case 27:  pfjetAK4jesup_TimePtEta[npfjetAK4] = sup; break;
+			case 28:  pfjetAK4jesup_Total[npfjetAK4] = sup; break;
+			default: continue;
+			}
 		}
 	
 		else if(isrc>nsrc){
@@ -3219,35 +3242,37 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 		    jecUnc->setJetPt(tmprecpt);
 	  
 			sup -= jecUnc->getUncertainty(false);
-			if(isrc==(nsrc+1)){ pfjetAK4jesdn_AbsoluteStat[npfjetAK4] = sup; }
-			if(isrc==(nsrc+2)){ pfjetAK4jesdn_AbsoluteScale[npfjetAK4] = sup; }
-			if(isrc==(nsrc+3)){ pfjetAK4jesdn_AbsoluteMPFBias[npfjetAK4] = sup; }
-			if(isrc==(nsrc+4)){ pfjetAK4jesdn_FlavorQCD[npfjetAK4] = sup; }
-			if(isrc==(nsrc+5)){ pfjetAK4jesdn_Fragmentation[npfjetAK4] = sup; }
-			if(isrc==(nsrc+6)){ pfjetAK4jesdn_PileUpDataMC[npfjetAK4] = sup; }
-			if(isrc==(nsrc+7)){ pfjetAK4jesdn_PileUpPtBB[npfjetAK4] = sup; }
-			if(isrc==(nsrc+8)){ pfjetAK4jesdn_PileUpPtEC1[npfjetAK4] = sup; }
-			if(isrc==(nsrc+9)){ pfjetAK4jesdn_PileUpPtEC2[npfjetAK4] = sup; }
-			if(isrc==(nsrc+10)){ pfjetAK4jesdn_PileUpPtHF[npfjetAK4] = sup; }
-			if(isrc==(nsrc+11)){ pfjetAK4jesdn_PileUpPtRef[npfjetAK4] = sup; }
-			if(isrc==(nsrc+12)){ pfjetAK4jesdn_RelativeFSR[npfjetAK4] = sup; }
-			if(isrc==(nsrc+13)){ pfjetAK4jesdn_RelativeJEREC1[npfjetAK4] = sup; }
-			if(isrc==(nsrc+14)){ pfjetAK4jesdn_RelativeJEREC2[npfjetAK4] = sup; }
-			if(isrc==(nsrc+15)){ pfjetAK4jesdn_RelativeJERHF[npfjetAK4] = sup; }
-			if(isrc==(nsrc+16)){ pfjetAK4jesdn_RelativePtBB[npfjetAK4] = sup; }
-			if(isrc==(nsrc+17)){ pfjetAK4jesdn_RelativePtEC1[npfjetAK4] = sup; }
-			if(isrc==(nsrc+18)){ pfjetAK4jesdn_RelativePtEC2[npfjetAK4] = sup; }
-			if(isrc==(nsrc+19)){ pfjetAK4jesdn_RelativePtHF[npfjetAK4] = sup; }
-			if(isrc==(nsrc+20)){ pfjetAK4jesdn_RelativeBal[npfjetAK4] = sup; }
-			if(isrc==(nsrc+21)){ pfjetAK4jesdn_RelativeSample[npfjetAK4] = sup; }
-			if(isrc==(nsrc+22)){ pfjetAK4jesdn_RelativeStatEC[npfjetAK4] = sup; }
-			if(isrc==(nsrc+23)){ pfjetAK4jesdn_RelativeStatHF[npfjetAK4] = sup; }
-			if(isrc==(nsrc+24)){ pfjetAK4jesdn_RelativeStatFSR[npfjetAK4] = sup; }
-			if(isrc==(nsrc+25)){ pfjetAK4jesdn_SinglePionECAL[npfjetAK4] = sup; }
-			if(isrc==(nsrc+26)){ pfjetAK4jesdn_SinglePionHCAL[npfjetAK4] = sup; }
-			if(isrc==(nsrc+27)){ pfjetAK4jesdn_TimePtEta[npfjetAK4] = sup; }
-			if(isrc==(nsrc+28)){ pfjetAK4jesdn_Total[npfjetAK4] = sup; }
-			
+			switch(isrc){
+			case (nsrc+1):  pfjetAK4jesdn_AbsoluteStat[npfjetAK4] = sup; break;
+			case (nsrc+2):  pfjetAK4jesdn_AbsoluteScale[npfjetAK4] = sup; break;
+			case (nsrc+3):  pfjetAK4jesdn_AbsoluteMPFBias[npfjetAK4] = sup; break;
+			case (nsrc+4):  pfjetAK4jesdn_FlavorQCD[npfjetAK4] = sup; break;
+			case (nsrc+5):  pfjetAK4jesdn_Fragmentation[npfjetAK4] = sup; break;
+			case (nsrc+6):  pfjetAK4jesdn_PileUpDataMC[npfjetAK4] = sup; break;
+			case (nsrc+7):  pfjetAK4jesdn_PileUpPtBB[npfjetAK4] = sup; break;
+			case (nsrc+8):  pfjetAK4jesdn_PileUpPtEC1[npfjetAK4] = sup; break;
+			case (nsrc+9):  pfjetAK4jesdn_PileUpPtEC2[npfjetAK4] = sup; break;
+			case (nsrc+10):  pfjetAK4jesdn_PileUpPtHF[npfjetAK4] = sup; break;
+			case (nsrc+11):  pfjetAK4jesdn_PileUpPtRef[npfjetAK4] = sup; break;
+			case (nsrc+12):  pfjetAK4jesdn_RelativeFSR[npfjetAK4] = sup; break;
+			case (nsrc+13):  pfjetAK4jesdn_RelativeJEREC1[npfjetAK4] = sup; break;
+			case (nsrc+14):  pfjetAK4jesdn_RelativeJEREC2[npfjetAK4] = sup; break;
+			case (nsrc+15):  pfjetAK4jesdn_RelativeJERHF[npfjetAK4] = sup; break;
+			case (nsrc+16):  pfjetAK4jesdn_RelativePtBB[npfjetAK4] = sup; break;
+			case (nsrc+17):  pfjetAK4jesdn_RelativePtEC1[npfjetAK4] = sup; break;
+			case (nsrc+18):  pfjetAK4jesdn_RelativePtEC2[npfjetAK4] = sup; break;
+			case (nsrc+19):  pfjetAK4jesdn_RelativePtHF[npfjetAK4] = sup; break;
+			case (nsrc+20):  pfjetAK4jesdn_RelativeBal[npfjetAK4] = sup; break;
+			case (nsrc+21):  pfjetAK4jesdn_RelativeSample[npfjetAK4] = sup; break;
+			case (nsrc+22):  pfjetAK4jesdn_RelativeStatEC[npfjetAK4] = sup; break;
+			case (nsrc+23):  pfjetAK4jesdn_RelativeStatHF[npfjetAK4] = sup; break;
+			case (nsrc+24):  pfjetAK4jesdn_RelativeStatFSR[npfjetAK4] = sup; break;
+			case (nsrc+25):  pfjetAK4jesdn_SinglePionECAL[npfjetAK4] = sup; break;
+			case (nsrc+26):  pfjetAK4jesdn_SinglePionHCAL[npfjetAK4] = sup; break;
+			case (nsrc+27):  pfjetAK4jesdn_TimePtEta[npfjetAK4] = sup; break;
+			case (nsrc+28):  pfjetAK4jesdn_Total[npfjetAK4] = sup; break;
+			default: continue;
+			}
 		}
 	
     }
@@ -3372,7 +3397,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
   
   }// skimming condition
   
-  T2->Fill(); // filling the tree used to get sumofweights
+  if (isMC) { T2->Fill();} // filling the tree used to get sumofweights
 }
 
 
