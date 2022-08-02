@@ -809,16 +809,17 @@ private:
     static const int nHLTmx = 17;
     const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele32_WPTight_Gsf_v","HLT_Ele20_WPLoose_Gsf_v","HLT_Ele300_CaloIdVT_GsfTrkIdT","HLT_AK8PFJet420_TrimMass30_v","HLT_AK8PFHT900_TrimMass50_v","HLT_PFJet500_v","HLT_AK8PFJet500_v","HLT_PFHT1050_v","HLT_AK8PFHT750_TrimMass50_v","HLT_AK8PFHT800_TrimMass50_v","HLT_AK8PFHT850_TrimMass50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v","HLT_DoubleEle33_CaloIdL_MW_v","HLT_DoubleEle25_CaloIdL_MW_v"};
   */  
-  static const int nHLTmx = 16;
+  static const int nHLTmx = 24;
   const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v", 
 				  "HLT_AK8PFJet500_v", "HLT_Photon200_v", 
 				  "HLT_Mu37_Ele27_CaloIdL_MW_v", "HLT_Mu27_Ele37_CaloIdL_MW_v", "HLT_Mu37_TkMu27_v", "HLT_OldMu100", "HLT_TkMu100_v", "HLT_DoubleEle25_CaloIdL_MW_v",
-				  "HLT_PFMET250_HBHECleaned","HLT_PFMET300_HBHECleaned","HLT_PFMET200_HBHE_BeamHaloCleaned","HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned"};
+				  "HLT_PFMET250_HBHECleaned","HLT_PFMET300_HBHECleaned","HLT_PFMET200_HBHE_BeamHaloCleaned","HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",
+				  "HLT_AK8PFHT800_TrimMass50_v","HLT_AK8PFHT900_TrimMass50_v","HLT_AK8PFJet400_TrimMass30_v","HLT_AK8PFJet420_TrimMass30_v","HLT_AK8PFJet550_v","HLT_CaloJet500_NoJetID_v","HLT_PFHT1050_v","HLT_PFJet500_v"};
   
   //HLT_AK8PFJet360_TrimMass30_v = > can be added 
     //HLT_Ele20_WPLoose_Gsf_v : this was there till 19th Jan, 2020 as 6th element 
   
-    bool hlt_IsoMu24, hlt_Mu50, hlt_Ele50_PFJet165, hlt_Ele115, hlt_AK8PFJet500, hlt_Photon200, hlt_Mu37Ele27, hlt_Mu27Ele37, hlt_Mu37TkMu27, hlt_OldMu100, hlt_TkMu100, hlt_DoubleEle25, hlt_PFMET250, hlt_PFMET300, hlt_PFMET200, hlt_PFMET200_TypeOne;  
+    bool hlt_IsoMu24, hlt_Mu50, hlt_Ele50_PFJet165, hlt_Ele115, hlt_AK8PFJet500, hlt_Photon200, hlt_Mu37Ele27, hlt_Mu27Ele37, hlt_Mu37TkMu27, hlt_OldMu100, hlt_TkMu100, hlt_DoubleEle25, hlt_PFMET250, hlt_PFMET300, hlt_PFMET200, hlt_PFMET200_TypeOne,hlt_AK8PFHT800_TrimMass50,hlt_AK8PFHT900_TrimMass50,hlt_AK8PFJet400_TrimMass30,hlt_AK8PFJet420_TrimMass30,hlt_AK8PFJet550,hlt_CaloJet500_NoJetID,hlt_PFHT1050,hlt_PFJet500;  
   
   int trig_value;
   
@@ -1050,7 +1051,15 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("hlt_PFMET300",&hlt_PFMET300,"hlt_PFMET300/O");
   T1->Branch("hlt_PFMET200",&hlt_PFMET200,"hlt_PFMET200/O");
   T1->Branch("hlt_PFMET200_TypeOne",&hlt_PFMET200_TypeOne,"hlt_PFMET200_TypeOne/O");
-  
+  T1->Branch("hlt_AK8PFHT800_TrimMass50",&hlt_AK8PFHT800_TrimMass50,"hlt_AK8PFHT800_TrimMass50/O");
+  T1->Branch("hlt_AK8PFHT900_TrimMass50",&hlt_AK8PFHT900_TrimMass50,"hlt_AK8PFHT900_TrimMass50/O");
+  T1->Branch("hlt_AK8PFJet400_TrimMass30",&hlt_AK8PFJet400_TrimMass30,"hlt_AK8PFJet400_TrimMass30/O");
+  T1->Branch("hlt_AK8PFJet420_TrimMass30",&hlt_AK8PFJet420_TrimMass30,"hlt_AK8PFJet420_TrimMass30/O");
+  T1->Branch("hlt_AK8PFJet550",&hlt_AK8PFJet550,"hlt_AK8PFJet550/O");
+  T1->Branch("hlt_CaloJet500_NoJetID",&hlt_CaloJet500_NoJetID,"hlt_CaloJet500_NoJetID/O");
+  T1->Branch("hlt_PFHT1050",&hlt_PFHT1050,"hlt_PFHT1050/O");
+  T1->Branch("hlt_PFJet500",&hlt_PFJet500,"hlt_PFJet500/O");
+    
   T1->Branch("ntrigobjs",&ntrigobjs,"ntrigobjs/I");
   T1->Branch("trigobjpt",trigobjpt,"trigobjpt[ntrigobjs]/F");
   T1->Branch("trigobjeta",trigobjeta,"trigobjeta[ntrigobjs]/F");
@@ -3429,6 +3438,38 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 
       case 15 :
 	hlt_PFMET200_TypeOne = booltrg[jk];
+	break;
+
+      case 16 :
+	hlt_AK8PFHT800_TrimMass50 = booltrg[jk];
+	break;
+
+      case 17 :
+	hlt_AK8PFHT900_TrimMass50 = booltrg[jk];
+	break;
+
+      case 18 :
+	hlt_AK8PFJet400_TrimMass30 = booltrg[jk];
+	break;
+	
+      case 19 :
+	hlt_AK8PFJet420_TrimMass30 = booltrg[jk];
+	break;
+	
+      case 20 :
+	hlt_AK8PFJet550 = booltrg[jk];
+	break;
+	
+      case 21 :
+	hlt_CaloJet500_NoJetID = booltrg[jk];
+	break;
+	
+      case 22 :
+	hlt_PFHT1050 = booltrg[jk];
+	break;
+	
+      case 23 :
+	hlt_PFJet500 = booltrg[jk];
 	break;
       }
     }	  
