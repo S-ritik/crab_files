@@ -793,7 +793,7 @@ private:
   int ntrigobjs;
   float trigobjpt[njetmx], trigobjeta[njetmx],trigobjphi[njetmx], trigobjmass[njetmx];
   bool trigobjHLT[njetmx], trigobjL1[njetmx],  trigobjBoth[njetmx];
-  int  trigobjIhlt[njetmx], trigobjpdgId[njetmx];
+  int  trigobjIhlt[njetmx], trigobjpdgId[njetmx], trigobjprescale[njetmx];
   
   float qscale;
   float wtfact;
@@ -809,18 +809,23 @@ private:
     static const int nHLTmx = 17;
     const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele32_WPTight_Gsf_v","HLT_Ele20_WPLoose_Gsf_v","HLT_Ele300_CaloIdVT_GsfTrkIdT","HLT_AK8PFJet420_TrimMass30_v","HLT_AK8PFHT900_TrimMass50_v","HLT_PFJet500_v","HLT_AK8PFJet500_v","HLT_PFHT1050_v","HLT_AK8PFHT750_TrimMass50_v","HLT_AK8PFHT800_TrimMass50_v","HLT_AK8PFHT850_TrimMass50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v","HLT_DoubleEle33_CaloIdL_MW_v","HLT_DoubleEle25_CaloIdL_MW_v"};
   */  
-  static const int nHLTmx = 24;
-  const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v", 
-				  "HLT_AK8PFJet500_v", "HLT_Photon200_v", 
-				  "HLT_Mu37_Ele27_CaloIdL_MW_v", "HLT_Mu27_Ele37_CaloIdL_MW_v", "HLT_Mu37_TkMu27_v", "HLT_OldMu100", "HLT_TkMu100_v", "HLT_DoubleEle25_CaloIdL_MW_v",
-				  "HLT_PFMET250_HBHECleaned","HLT_PFMET300_HBHECleaned","HLT_PFMET200_HBHE_BeamHaloCleaned","HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",
-				  "HLT_AK8PFHT800_TrimMass50_v","HLT_AK8PFHT900_TrimMass50_v","HLT_AK8PFJet400_TrimMass30_v","HLT_AK8PFJet420_TrimMass30_v","HLT_AK8PFJet550_v","HLT_CaloJet500_NoJetID_v","HLT_PFHT1050_v","HLT_PFJet500_v"};
+  static const int nHLTmx = 38;
+  const char *hlt_name[nHLTmx] = {"HLT_IsoMu24_v","HLT_Mu50_v","HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v","HLT_Ele115_CaloIdVT_GsfTrkIdT_v",   //4
+				  "HLT_AK8PFJet500_v", "HLT_Photon200_v",     //6
+				  "HLT_Mu37_Ele27_CaloIdL_MW_v", "HLT_Mu27_Ele37_CaloIdL_MW_v", "HLT_Mu37_TkMu27_v", "HLT_OldMu100", "HLT_TkMu100_v", "HLT_DoubleEle25_CaloIdL_MW_v",  //12
+				  "HLT_PFMET250_HBHECleaned","HLT_PFMET300_HBHECleaned","HLT_PFMET200_HBHE_BeamHaloCleaned","HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",      //16
+				  "HLT_AK8PFHT800_TrimMass50_v","HLT_AK8PFHT900_TrimMass50_v","HLT_AK8PFJet400_TrimMass30_v","HLT_AK8PFJet420_TrimMass30_v","HLT_AK8PFJet550_v","HLT_CaloJet500_NoJetID_v","HLT_PFHT1050_v",   //23
+				  "HLT_PFJet500_v","HLT_AK8PFJet320_v","HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p17_v","HLT_AK8PFJet360_TrimMass30_v","HLT_DiPFJetAve400_v","HLT_PFJet400_v","HLT_PFJet320_v","HLT_PFJet200_v",  //31
+				  "HLT_CaloMET100_HBHECleaned_v","HLT_CaloMET250_HBHECleaned_v","HLT_CaloMET90_HBHECleaned_v","HLT_CaloMET70_HBHECleaned_v","HLT_PFMETTypeOne140_PFMHT140_IDTight_v","HLT_PFMETTypeOne120_PFMHT120_IDTight_v","HLT_CaloMET80_HBHECleaned_v"};
   
   //HLT_AK8PFJet360_TrimMass30_v = > can be added 
     //HLT_Ele20_WPLoose_Gsf_v : this was there till 19th Jan, 2020 as 6th element 
   
-    bool hlt_IsoMu24, hlt_Mu50, hlt_Ele50_PFJet165, hlt_Ele115, hlt_AK8PFJet500, hlt_Photon200, hlt_Mu37Ele27, hlt_Mu27Ele37, hlt_Mu37TkMu27, hlt_OldMu100, hlt_TkMu100, hlt_DoubleEle25, hlt_PFMET250, hlt_PFMET300, hlt_PFMET200, hlt_PFMET200_TypeOne,hlt_AK8PFHT800_TrimMass50,hlt_AK8PFHT900_TrimMass50,hlt_AK8PFJet400_TrimMass30,hlt_AK8PFJet420_TrimMass30,hlt_AK8PFJet550,hlt_CaloJet500_NoJetID,hlt_PFHT1050,hlt_PFJet500;  
+    bool hlt_IsoMu24, hlt_Mu50, hlt_Ele50_PFJet165, hlt_Ele115, hlt_AK8PFJet500, hlt_Photon200, hlt_Mu37Ele27, hlt_Mu27Ele37, hlt_Mu37TkMu27, hlt_OldMu100, hlt_TkMu100, hlt_DoubleEle25, hlt_PFMET250, hlt_PFMET300, hlt_PFMET200, hlt_PFMET200_TypeOne,hlt_AK8PFHT800_TrimMass50,hlt_AK8PFHT900_TrimMass50,hlt_AK8PFJet400_TrimMass30,hlt_AK8PFJet420_TrimMass30,hlt_AK8PFJet550,hlt_CaloJet500_NoJetID,hlt_PFHT1050,hlt_PFJet500,hlt_AK8PFJet320, hlt_AK8PFJet330_PFAK8BTagDeepCSV,hlt_AK8PFJet360_TrimMass30,hlt_DiPFJetAve400,hlt_PFJet400,hlt_PFJet320,hlt_PFJet200,hlt_CaloMET100_HBHECleaned,hlt_CaloMET250_HBHECleaned,hlt_CaloMET90_HBHECleaned,hlt_CaloMET70_HBHECleaned,hlt_PFMETTypeOne140_PFMHT140_IDTight,hlt_PFMETTypeOne120_PFMHT120_IDTight,hlt_CaloMET80_HBHECleaned;
   
+  float psfactor_hlt_IsoMu24, psfactor_hlt_Mu50, psfactor_hlt_Ele50_PFJet165, psfactor_hlt_Ele115, psfactor_hlt_AK8PFJet500, psfactor_hlt_Photon200, psfactor_hlt_Mu37Ele27, psfactor_hlt_Mu27Ele37, psfactor_hlt_Mu37TkMu27, psfactor_hlt_OldMu100, psfactor_hlt_TkMu100, psfactor_hlt_DoubleEle25, psfactor_hlt_PFMET250, psfactor_hlt_PFMET300, psfactor_hlt_PFMET200, psfactor_hlt_PFMET200_TypeOne, psfactor_hlt_AK8PFHT800_TrimMass50, psfactor_hlt_AK8PFHT900_TrimMass50, psfactor_hlt_AK8PFJet400_TrimMass30, psfactor_hlt_AK8PFJet420_TrimMass30, psfactor_hlt_AK8PFJet550, psfactor_hlt_CaloJet500_NoJetID, psfactor_hlt_PFHT1050, psfactor_hlt_PFJet500, psfactor_hlt_AK8PFJet320, psfactor_hlt_AK8PFJet330_PFAK8BTagDeepCSV, psfactor_hlt_AK8PFJet360_TrimMass30, psfactor_hlt_DiPFJetAve400, psfactor_hlt_PFJet400, psfactor_hlt_PFJet320, psfactor_hlt_PFJet200, psfactor_hlt_CaloMET100_HBHECleaned, psfactor_hlt_CaloMET250_HBHECleaned, psfactor_hlt_CaloMET90_HBHECleaned, psfactor_hlt_CaloMET70_HBHECleaned, psfactor_hlt_PFMETTypeOne140_PFMHT140_IDTight, psfactor_hlt_PFMETTypeOne120_PFMHT120_IDTight, psfactor_hlt_CaloMET80_HBHECleaned;  
+
+  float ps_column;
   int trig_value;
   
   HLTPrescaleProvider hltPrescaleProvider_;
@@ -1059,7 +1064,61 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("hlt_CaloJet500_NoJetID",&hlt_CaloJet500_NoJetID,"hlt_CaloJet500_NoJetID/O");
   T1->Branch("hlt_PFHT1050",&hlt_PFHT1050,"hlt_PFHT1050/O");
   T1->Branch("hlt_PFJet500",&hlt_PFJet500,"hlt_PFJet500/O");
-    
+  T1->Branch("hlt_AK8PFJet320",&hlt_AK8PFJet320,"hlt_AK8PFJet320/O");
+  T1->Branch("hlt_AK8PFJet330_PFAK8BTagDeepCSV",&hlt_AK8PFJet330_PFAK8BTagDeepCSV,"hlt_AK8PFJet330_PFAK8BTagDeepCSV/O");
+  T1->Branch("hlt_AK8PFJet360_TrimMass30",&hlt_AK8PFJet360_TrimMass30,"hlt_AK8PFJet360_TrimMass30/O");
+  T1->Branch("hlt_DiPFJetAve400",&hlt_DiPFJetAve400,"hlt_DiPFJetAve400/O");
+  T1->Branch("hlt_PFJet400",&hlt_PFJet400,"hlt_PFJet400/O");
+  T1->Branch("hlt_PFJet320",&hlt_PFJet320,"hlt_PFJet320/O");
+  T1->Branch("hlt_PFJet200",&hlt_PFJet200,"hlt_PFJet200/O");
+  T1->Branch("hlt_CaloMET100_HBHECleaned",&hlt_CaloMET100_HBHECleaned,"hlt_CaloMET100_HBHECleaned/O");
+  T1->Branch("hlt_CaloMET250_HBHECleaned",&hlt_CaloMET250_HBHECleaned,"hlt_CaloMET250_HBHECleaned/O");
+  T1->Branch("hlt_CaloMET90_HBHECleaned",&hlt_CaloMET90_HBHECleaned,"hlt_CaloMET90_HBHECleaned/O");
+  T1->Branch("hlt_CaloMET70_HBHECleaned",&hlt_CaloMET70_HBHECleaned,"hlt_CaloMET70_HBHECleaned/O");
+  T1->Branch("hlt_PFMETTypeOne140_PFMHT140_IDTight",&hlt_PFMETTypeOne140_PFMHT140_IDTight,"hlt_PFMETTypeOne140_PFMHT140_IDTight/O");
+  T1->Branch("hlt_PFMETTypeOne120_PFMHT120_IDTight",&hlt_PFMETTypeOne120_PFMHT120_IDTight,"hlt_PFMETTypeOne120_PFMHT120_IDTight/O");
+  T1->Branch("hlt_CaloMET80_HBHECleaned",&hlt_CaloMET80_HBHECleaned,"hlt_CaloMET80_HBHECleaned/O");
+
+  T1->Branch("psfactor_hlt_IsoMu24",&psfactor_hlt_IsoMu24,"psfactor_hlt_IsoMu24/F");
+  T1->Branch("psfactor_hlt_Mu50",&psfactor_hlt_Mu50,"psfactor_hlt_Mu50/F");
+  T1->Branch("psfactor_hlt_Ele50_PFJet165",&psfactor_hlt_Ele50_PFJet165,"psfactor_hlt_Ele50_PFJet165/F");
+  T1->Branch("psfactor_hlt_Ele115",&psfactor_hlt_Ele115,"psfactor_hlt_Ele115/F");
+  T1->Branch("psfactor_hlt_AK8PFJet500",&psfactor_hlt_AK8PFJet500,"psfactor_hlt_AK8PFJet500/F");
+  T1->Branch("psfactor_hlt_Photon200",&psfactor_hlt_Photon200,"psfactor_hlt_Photon200/F");
+  T1->Branch("psfactor_hlt_Mu37Ele27",&psfactor_hlt_Mu37Ele27,"psfactor_hlt_Mu37Ele27/F");
+  T1->Branch("psfactor_hlt_Mu27Ele37",&psfactor_hlt_Mu27Ele37,"psfactor_hlt_Mu27Ele37/F");
+  T1->Branch("psfactor_hlt_Mu37TkMu27",&psfactor_hlt_Mu37TkMu27,"psfactor_hlt_Mu37TkMu27/F");
+  T1->Branch("psfactor_hlt_OldMu100",&psfactor_hlt_OldMu100,"psfactor_hlt_OldMu100/F");
+  T1->Branch("psfactor_hlt_TkMu100",&psfactor_hlt_TkMu100,"psfactor_hlt_TkMu100/F");
+  T1->Branch("psfactor_hlt_DoubleEle25",&psfactor_hlt_DoubleEle25,"psfactor_hlt_DoubleEle25/F");
+  T1->Branch("psfactor_hlt_PFMET250",&psfactor_hlt_PFMET250,"psfactor_hlt_PFMET250/F");
+  T1->Branch("psfactor_hlt_PFMET300",&psfactor_hlt_PFMET300,"psfactor_hlt_PFMET300/F");
+  T1->Branch("psfactor_hlt_PFMET200",&psfactor_hlt_PFMET200,"psfactor_hlt_PFMET200/F");
+  T1->Branch("psfactor_hlt_PFMET200_TypeOne",&psfactor_hlt_PFMET200_TypeOne,"psfactor_hlt_PFMET200_TypeOne/F");
+  T1->Branch("psfactor_hlt_AK8PFHT800_TrimMass50",&psfactor_hlt_AK8PFHT800_TrimMass50,"psfactor_hlt_AK8PFHT800_TrimMass50/F");
+  T1->Branch("psfactor_hlt_AK8PFHT900_TrimMass50",&psfactor_hlt_AK8PFHT900_TrimMass50,"psfactor_hlt_AK8PFHT900_TrimMass50/F");
+  T1->Branch("psfactor_hlt_AK8PFJet400_TrimMass30",&psfactor_hlt_AK8PFJet400_TrimMass30,"psfactor_hlt_AK8PFJet400_TrimMass30/F");
+  T1->Branch("psfactor_hlt_AK8PFJet420_TrimMass30",&psfactor_hlt_AK8PFJet420_TrimMass30,"psfactor_hlt_AK8PFJet420_TrimMass30/F");
+  T1->Branch("psfactor_hlt_AK8PFJet550",&psfactor_hlt_AK8PFJet550,"psfactor_hlt_AK8PFJet550/F");
+  T1->Branch("psfactor_hlt_CaloJet500_NoJetID",&psfactor_hlt_CaloJet500_NoJetID,"psfactor_hlt_CaloJet500_NoJetID/F");
+  T1->Branch("psfactor_hlt_PFHT1050",&psfactor_hlt_PFHT1050,"psfactor_hlt_PFHT1050/F");
+  T1->Branch("psfactor_hlt_PFJet500",&psfactor_hlt_PFJet500,"psfactor_hlt_PFJet500/F");
+  T1->Branch("psfactor_hlt_AK8PFJet320",&psfactor_hlt_AK8PFJet320,"psfactor_hlt_AK8PFJet320/F");
+  T1->Branch("psfactor_hlt_AK8PFJet330_PFAK8BTagDeepCSV",&psfactor_hlt_AK8PFJet330_PFAK8BTagDeepCSV,"psfactor_hlt_AK8PFJet330_PFAK8BTagDeepCSV/F");
+  T1->Branch("psfactor_hlt_AK8PFJet360_TrimMass30",&psfactor_hlt_AK8PFJet360_TrimMass30,"psfactor_hlt_AK8PFJet360_TrimMass30/F");
+  T1->Branch("psfactor_hlt_DiPFJetAve400",&psfactor_hlt_DiPFJetAve400,"psfactor_hlt_DiPFJetAve400/F");
+  T1->Branch("psfactor_hlt_PFJet400",&psfactor_hlt_PFJet400,"psfactor_hlt_PFJet400/F");
+  T1->Branch("psfactor_hlt_PFJet320",&psfactor_hlt_PFJet320,"psfactor_hlt_PFJet320/F");
+  T1->Branch("psfactor_hlt_PFJet200",&psfactor_hlt_PFJet200,"psfactor_hlt_PFJet200/F");
+  T1->Branch("psfactor_hlt_CaloMET100_HBHECleaned",&psfactor_hlt_CaloMET100_HBHECleaned,"psfactor_hlt_CaloMET100_HBHECleaned/F");
+  T1->Branch("psfactor_hlt_CaloMET250_HBHECleaned",&psfactor_hlt_CaloMET250_HBHECleaned,"psfactor_hlt_CaloMET250_HBHECleaned/F");
+  T1->Branch("psfactor_hlt_CaloMET90_HBHECleaned",&psfactor_hlt_CaloMET90_HBHECleaned,"psfactor_hlt_CaloMET90_HBHECleaned/F");
+  T1->Branch("psfactor_hlt_CaloMET70_HBHECleaned",&psfactor_hlt_CaloMET70_HBHECleaned,"psfactor_hlt_CaloMET70_HBHECleaned/F");
+  T1->Branch("psfactor_hlt_PFMETTypeOne140_PFMHT140_IDTight",&psfactor_hlt_PFMETTypeOne140_PFMHT140_IDTight,"psfactor_hlt_PFMETTypeOne140_PFMHT140_IDTight/F");
+  T1->Branch("psfactor_hlt_PFMETTypeOne120_PFMHT120_IDTight",&psfactor_hlt_PFMETTypeOne120_PFMHT120_IDTight,"psfactor_hlt_PFMETTypeOne120_PFMHT120_IDTight/F");
+  T1->Branch("psfactor_hlt_CaloMET80_HBHECleaned",&psfactor_hlt_CaloMET80_HBHECleaned,"psfactor_hlt_CaloMET80_HBHECleaned/F");
+  T1->Branch("ps_column",&ps_column,"ps_column/F");
+	     
   T1->Branch("ntrigobjs",&ntrigobjs,"ntrigobjs/I");
   T1->Branch("trigobjpt",trigobjpt,"trigobjpt[ntrigobjs]/F");
   T1->Branch("trigobjeta",trigobjeta,"trigobjeta[ntrigobjs]/F");
@@ -1069,6 +1128,7 @@ Leptop::Leptop(const edm::ParameterSet& pset):
   T1->Branch("trigobjL1",trigobjL1,"trigobjL1[ntrigobjs]/O");
   //T1->Branch("trigobjBoth",trigobjBoth,"trigobjBoth[ntrigobjs]/O");
   T1->Branch("trigobjIhlt",trigobjIhlt,"trigobjIhlt[ntrigobjs]/I");
+  //T1->Branch("trigobjprescale",trigobjprescale,"trigobjprescale[ntrigobjs]/I");
   T1->Branch("trigobjpdgId",trigobjpdgId,"trigobjpdgId[ntrigobjs]/I");
 
   // Prefire weights //
@@ -1784,7 +1844,11 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
   
   int ihlttrg[nHLTmx+1]= {0};
   bool booltrg[nHLTmx]= {false};
-  
+  float psfactor_booltrg[nHLTmx];
+  fill_n(booltrg, nHLTmx, false);
+  fill_n(psfactor_booltrg, nHLTmx, 0);
+  ps_column = hltPrescaleProvider_.prescaleSet(iEvent,pset);
+    
   for (int jk=0; jk<nHLTmx; jk++) {
     for(unsigned ij = 0; ij<trigRes->size(); ++ij) {
       std::string name = names.triggerName(ij);
@@ -1794,6 +1858,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	  if ((trigRes->accept(ij))){   //||(isMC)) {
 	    ihlttrg[jk] = ihlttrg[nHLTmx] = 1;
 	    booltrg[jk] = true;
+	    psfactor_booltrg[jk] = hltPrescaleProvider_.prescaleValue( iEvent, pset, name);
 	    break;
 	  }
 	}
@@ -1836,7 +1901,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	      tmpvec1.level1 = obj.hasPathName( pathNamesAll[ih], true, false );
 	      tmpvec1.trg4v = TLorentzVector(obj.px(), obj.py(), obj.pz(), obj.energy());
 	      tmpvec1.pdgId = obj.pdgId();
-	      tmpvec1.prescl = 1;    //triggerPrescales->getPrescaleForIndex(ij);
+	      tmpvec1.prescl = 1;//triggerPrescales->getPrescaleForIndex(ih);
 	      tmpvec1.ihlt = jk;
 	      alltrgobj.push_back(tmpvec1);
 	      break;
@@ -1862,6 +1927,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
 	trigobjL1[xht] = alltrgobj[iht].level1;
 	trigobjBoth[xht] = alltrgobj[iht].both;
 	trigobjIhlt[xht] = alltrgobj[iht].ihlt;
+	//trigobjprescale[xht] = alltrgobj[iht].prescl;
 	trigobjpdgId[xht] = alltrgobj[iht].pdgId;
 	xht++;
       }
@@ -3375,101 +3441,195 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
     for(int jk=0; jk<nHLTmx; jk++) {
     
       switch(jk) {
-      
+	
       case 0 :
 	hlt_IsoMu24 = booltrg[jk];
+	psfactor_hlt_IsoMu24 = psfactor_booltrg[jk];
 	break;
       
       case 1 :
 	hlt_Mu50 = booltrg[jk];
+	psfactor_hlt_Mu50 = psfactor_booltrg[jk];
 	break;
       
       case 2 :
 	hlt_Ele50_PFJet165 = booltrg[jk];
+	psfactor_hlt_Ele50_PFJet165 = psfactor_booltrg[jk];
 	break;
       
       case 3 :
 	hlt_Ele115 = booltrg[jk];
+	psfactor_hlt_Ele115 = psfactor_booltrg[jk];
 	break;
       
       case 4 :
 	hlt_AK8PFJet500 = booltrg[jk];
+	psfactor_hlt_AK8PFJet500 = psfactor_booltrg[jk];
 	break;
       
       case 5 :
 	hlt_Photon200 = booltrg[jk];
+	psfactor_hlt_Photon200 = psfactor_booltrg[jk];
 	break;
       
       case 6 :
 	hlt_Mu37Ele27 = booltrg[jk];
+	psfactor_hlt_Mu37Ele27 = psfactor_booltrg[jk];
 	break;
       
       case 7 :
 	hlt_Mu27Ele37 = booltrg[jk];
+	psfactor_hlt_Mu27Ele37 = psfactor_booltrg[jk];
 	break;
       
       case 8 :
 	hlt_Mu37TkMu27 = booltrg[jk];
+	psfactor_hlt_Mu37TkMu27 = psfactor_booltrg[jk];
 	break;
       
       case 9 :
 	hlt_OldMu100 = booltrg[jk];
+	psfactor_hlt_OldMu100 = psfactor_booltrg[jk];
 	break;
 	  
       case 10 :
 	hlt_TkMu100 = booltrg[jk];
+	psfactor_hlt_TkMu100 = psfactor_booltrg[jk];
 	break;
       
       case 11 :
 	hlt_DoubleEle25 = booltrg[jk];
+	psfactor_hlt_DoubleEle25 = psfactor_booltrg[jk];
 	break;
 
       case 12 :
 	hlt_PFMET250 = booltrg[jk];
+	psfactor_hlt_PFMET250 = psfactor_booltrg[jk];
 	break;
       
       case 13 :
 	hlt_PFMET300 = booltrg[jk];
+	psfactor_hlt_PFMET300 = psfactor_booltrg[jk];
 	break;
 
       case 14 :
 	hlt_PFMET200 = booltrg[jk];
+	psfactor_hlt_PFMET200 = psfactor_booltrg[jk];
 	break;
 
       case 15 :
 	hlt_PFMET200_TypeOne = booltrg[jk];
+	psfactor_hlt_PFMET200_TypeOne = psfactor_booltrg[jk];
 	break;
 
       case 16 :
 	hlt_AK8PFHT800_TrimMass50 = booltrg[jk];
+	psfactor_hlt_AK8PFHT800_TrimMass50 = psfactor_booltrg[jk];
 	break;
 
       case 17 :
 	hlt_AK8PFHT900_TrimMass50 = booltrg[jk];
+	psfactor_hlt_AK8PFHT900_TrimMass50 = psfactor_booltrg[jk];
 	break;
 
       case 18 :
 	hlt_AK8PFJet400_TrimMass30 = booltrg[jk];
+	psfactor_hlt_AK8PFJet400_TrimMass30 = psfactor_booltrg[jk];
 	break;
 	
       case 19 :
 	hlt_AK8PFJet420_TrimMass30 = booltrg[jk];
+	psfactor_hlt_AK8PFJet420_TrimMass30 = psfactor_booltrg[jk];
 	break;
 	
       case 20 :
 	hlt_AK8PFJet550 = booltrg[jk];
+	psfactor_hlt_AK8PFJet550 = psfactor_booltrg[jk];
 	break;
 	
       case 21 :
 	hlt_CaloJet500_NoJetID = booltrg[jk];
+	psfactor_hlt_CaloJet500_NoJetID = psfactor_booltrg[jk];
 	break;
 	
       case 22 :
 	hlt_PFHT1050 = booltrg[jk];
+	psfactor_hlt_PFHT1050 = psfactor_booltrg[jk];
 	break;
 	
       case 23 :
 	hlt_PFJet500 = booltrg[jk];
+	psfactor_hlt_PFJet500 = psfactor_booltrg[jk];
+	break;
+
+      case 24 :
+	hlt_AK8PFJet320 = booltrg[jk];
+	psfactor_hlt_AK8PFJet320 = psfactor_booltrg[jk];
+	break;
+
+      case 25 :
+	hlt_AK8PFJet330_PFAK8BTagDeepCSV = booltrg[jk];
+	psfactor_hlt_AK8PFJet330_PFAK8BTagDeepCSV = psfactor_booltrg[jk];
+	break;
+
+      case 26 :
+	hlt_AK8PFJet360_TrimMass30 = booltrg[jk];
+	psfactor_hlt_AK8PFJet360_TrimMass30 = psfactor_booltrg[jk];
+	break;
+
+      case 27 :
+	hlt_DiPFJetAve400 = booltrg[jk];
+	psfactor_hlt_DiPFJetAve400 = psfactor_booltrg[jk];
+	break;
+
+      case 28 :
+	hlt_PFJet400 = booltrg[jk];
+	psfactor_hlt_PFJet400 = psfactor_booltrg[jk];
+	break;
+	
+      case 29 :
+	hlt_PFJet320 = booltrg[jk];
+	psfactor_hlt_PFJet320 = psfactor_booltrg[jk];
+	break;
+	
+      case 30 :
+	hlt_PFJet200 = booltrg[jk];
+	psfactor_hlt_PFJet200 = psfactor_booltrg[jk];
+	break;
+	
+      case 31 :
+	hlt_CaloMET100_HBHECleaned = booltrg[jk];
+	psfactor_hlt_CaloMET100_HBHECleaned = psfactor_booltrg[jk];
+	break;
+	
+      case 32 :
+	hlt_CaloMET250_HBHECleaned = booltrg[jk];
+	psfactor_hlt_CaloMET250_HBHECleaned = psfactor_booltrg[jk];
+	break;
+	
+      case 33 :
+	hlt_CaloMET90_HBHECleaned = booltrg[jk];
+	psfactor_hlt_CaloMET90_HBHECleaned = psfactor_booltrg[jk];
+	break;
+
+      case 34 :
+	hlt_CaloMET70_HBHECleaned = booltrg[jk];
+	psfactor_hlt_CaloMET70_HBHECleaned = psfactor_booltrg[jk];
+	break;
+
+      case 35 :
+	hlt_PFMETTypeOne140_PFMHT140_IDTight = booltrg[jk];
+	psfactor_hlt_PFMETTypeOne140_PFMHT140_IDTight = psfactor_booltrg[jk];
+	break;
+
+      case 36 :
+	hlt_PFMETTypeOne120_PFMHT120_IDTight = booltrg[jk];
+	psfactor_hlt_PFMETTypeOne120_PFMHT120_IDTight = psfactor_booltrg[jk];
+	break;
+
+      case 37 :
+	hlt_CaloMET80_HBHECleaned = booltrg[jk];
+	psfactor_hlt_CaloMET80_HBHECleaned = psfactor_booltrg[jk];
 	break;
       }
     }	  
