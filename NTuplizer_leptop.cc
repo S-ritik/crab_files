@@ -699,6 +699,10 @@ private:
   float LHEpartpt[nlhemax], LHEparteta[nlhemax], LHEpartphi[nlhemax], LHEpartm[nlhemax];
   int LHEpartpdg[nlhemax];
 
+  static const int nlheallweightsmax = 152;
+  int nLHEAllWeights;
+  float LHEAllWeights[nlheallweightsmax];
+
   static const int nlhescalemax = 9;
   int nLHEScaleWeights;
   float LHEScaleWeights[nlhescalemax];
@@ -1489,6 +1493,8 @@ Leptop::Leptop(const edm::ParameterSet& pset):
     T1->Branch("LHEpartm",LHEpartm,"LHEpartm[nLHEparticles]/F");
 
     T1->Branch("LHE_weight",&LHE_weight, "LHE_weight/D");
+    T1->Branch("nLHEAllWeights",&nLHEAllWeights, "nLHEAllWeights/I");
+    T1->Branch("LHEAllWeights",LHEAllWeights,"LHEAllWeights[nLHEAllWeights]/F");
     T1->Branch("nLHEScaleWeights",&nLHEScaleWeights, "nLHEScaleWeights/I");
     T1->Branch("LHEScaleWeights",LHEScaleWeights,"LHEScaleWeights[nLHEScaleWeights]/F");
     T1->Branch("nLHEPDFWeights",&nLHEPDFWeights, "nLHEPDFWeights/I");
@@ -1714,6 +1720,7 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       const auto & hepeup = lheeventinfo->hepeup();
       const auto & pup = hepeup.PUP;
 
+      nLHEAllWeights = 0;
       nLHEScaleWeights = 0;
       nLHEPDFWeights = 0;
       nLHEAlpsWeights = 0;
@@ -1742,7 +1749,15 @@ Leptop::analyze(const edm::Event& iEvent, const edm::EventSetup& pset) {
       } 
       
       for ( unsigned int index = 0; index < lheeventinfo->weights().size(); ++index ) {	
-	//cout<<"Index "<<index+1<<" Id "<<lheeventinfo->weights()[index].id<<" weight "<<lheeventinfo->weights()[index].wgt/LHE_weight<<endl;//" muR "<<lheeventinfo->weights()[index].MUR<<" muF "<<lheeventinfo->weights()[index].MUF<<" DYN Scale "<<lheeventinfo->weights()[index].DYN_SCALE<<endl;
+	//cout<<"Index "<<index+1<<" Id "<<lheeventinfo->weights()[index].id<<" weight "<<lheeventinfo->weights()[index].wgt/LHE_weight<<" muR "<<lheeventinfo->weights()[index].MUR<<" muF "<<lheeventinfo->weights()[index].MUF<<" DYN Scale "<<lheeventinfo->weights()[index].DYN_SCALE<<endl;
+
+	if(index < nlheallweightsmax)
+	  {
+	    LHEAllWeights[nLHEAllWeights] = lheeventinfo->weights()[index].wgt;
+	    nLHEAllWeights++;
+	  }
+	else break;
+	
 	if(index<nlhescalemax && nLHEScaleWeights<nlhescalemax){
 	  LHEScaleWeights[nLHEScaleWeights] = lheeventinfo->weights()[index].wgt/LHE_weight;
 	  nLHEScaleWeights++;
